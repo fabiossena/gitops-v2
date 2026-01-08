@@ -1,0 +1,7 @@
+- name: Debian Bootstrap
+  hosts: debian
+  become: true
+
+  roles:
+    - role: base
+      tags: [base]

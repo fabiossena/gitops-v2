@@ -1,0 +1,4 @@
+argocd_namespace: argocd
+argocd_version: stable
+gitops_repo_url: https://github.com/fabiossena/gitops-v2.git
+gitops_repo_path: gitops/apps

@@ -1,0 +1,20 @@
+- name: Stop and disable SSH
+  service:
+    name: ssh
+    state: stopped
+    enabled: false
+  tags: [rollback, ssh]
+
+- name: Remove base packages
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - unzip
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - apt-transport-https
+    state: absent
+  tags: [rollback, packages]

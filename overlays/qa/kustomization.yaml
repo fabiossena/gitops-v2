@@ -2,4 +2,4 @@
 resources:
   - ../../base
 patches:
-  - path: php-patch.yaml
+  - path: main-patch.yaml

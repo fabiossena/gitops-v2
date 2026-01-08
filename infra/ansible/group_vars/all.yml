@@ -1,0 +1,39 @@
+# --------------------------------------------------
+# Global Ansible configuration for all hosts
+# --------------------------------------------------
+
+# Force Ansible to use Python 3 (required on Debian 11/12)
+ansible_python_interpreter: /usr/bin/python3
+
+# SSH settings
+ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+ansible_connection: ssh
+ansible_become: true
+ansible_become_method: sudo
+
+# Default privilege escalation user (optional)
+# ansible_become_user: root
+
+# Timeout and retries (useful for first boot / WSL / cloud-init)
+ansible_ssh_timeout: 30
+ansible_ssh_retries: 3
+
+# Facts gathering (keep enabled for most roles)
+ansible_gathering: smart
+ansible_gather_subset:
+  - hardware
+  - network
+  - virtual
+
+# Package manager behavior (Debian-based systems)
+apt_cache_valid_time: 3600
+
+# Locale / environment (optional but recommended)
+ansible_env:
+  LANG: en_US.UTF-8
+  LC_ALL: en_US.UTF-8
+
+ansible_user: fabiossena
+ansible_ssh_private_key_file: ~/.ssh/id_gitops
+
+k3s_version: v1.29.1+k3s1

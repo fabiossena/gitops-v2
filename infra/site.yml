@@ -1,0 +1,9 @@
+- hosts: all
+  roles:
+    - common
+
+- hosts: k3s_master
+  roles:
+    - k3s
+    - argocd
+    - k9s

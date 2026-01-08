@@ -1,0 +1,6 @@
+# roles/k3s/tasks/main.yml
+- name: Instalar K3s
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -
+  args:
+    creates: /usr/local/bin/k3s

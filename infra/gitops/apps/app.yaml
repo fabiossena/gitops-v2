@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: main-namespace
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fabiossena/gitops-v2.git
+    path: gitops/apps/main-namespace
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: main-namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

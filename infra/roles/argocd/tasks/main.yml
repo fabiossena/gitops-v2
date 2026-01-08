@@ -1,0 +1,14 @@
+- name: Create ArgoCD namespace
+  shell: kubectl create namespace {{ argocd_namespace }}
+  args:
+    creates: /var/lib/rancher/k3s/server/manifests/argocd-ns.yaml
+
+- name: Install ArgoCD
+  template:
+    src: argocd-install.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/argocd.yaml
+
+- name: Deploy App of Apps
+  template:
+    src: app-of-apps.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
