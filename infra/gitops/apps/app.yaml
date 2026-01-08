@@ -6,7 +6,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/fabiossena/gitops-v2.git
-    path: gitops/apps/main-namespace
+    path: infra/gitops/apps/main-namespace
     targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
