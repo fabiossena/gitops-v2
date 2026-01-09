@@ -28,7 +28,7 @@
     kind: Service
     name: argocd-server
     namespace: "{{ argocd_namespace }}"
-    merge_type: strategic
+    merge_type: strategic-merge
     definition:
       spec:
         type: NodePort
