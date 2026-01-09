@@ -44,8 +44,15 @@
       - socat
       - conntrack
       - util-linux
+      - python3-pip      # garante que o pip esteja disponível
     state: present
     update_cache: yes
+  become: yes
+
+- name: Atualizar pip e instalar bibliotecas Python para Ansible K8s
+  shell: |
+    /usr/bin/python3.13 -m pip install --upgrade pip
+    /usr/bin/python3.13 -m pip install kubernetes openshift
   become: yes
 
 - name: Carregar módulos de kernel necessários
