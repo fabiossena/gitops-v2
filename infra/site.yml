@@ -7,3 +7,5 @@
     - k3s
     - argocd
     - k9s
+
+- import_playbook: ansible/playbooks/bootstrap.yml
