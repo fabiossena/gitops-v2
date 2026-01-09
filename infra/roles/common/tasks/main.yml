@@ -1,2 +1,0 @@
-# roles/k9s/tasks/main.yml
-k9s_version: "v0.32.4"

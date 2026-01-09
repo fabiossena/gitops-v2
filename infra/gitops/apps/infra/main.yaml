@@ -33,9 +33,7 @@
 
   post_tasks:
     - name: Ensure kubeconfig permissions
-      file:
-        path: "{{ kubeconfig_path }}"
-        owner: root
+      roles:
         group: root
         mode: '0644'
       when: ansible_facts['os_family'] == "Debian"
