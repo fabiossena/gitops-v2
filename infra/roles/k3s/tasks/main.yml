@@ -61,11 +61,7 @@
 - name: Instalar K3s (master) # padrão é 6443
   shell: |
     curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="v1.27.10+k3s1" sh -
-  # shell: | 
-  #   export K3S_KUBECONFIG_MODE="644"
-  #   export INSTALL_K3S_VERSION="v1.27.10+k3s1"
-  #   export K3S_ARGS="--https-listen-port=7443"  # <-- aqui você muda a porta
-  #   curl -sfL https://get.k3s.io | sh -
+  
   args:
     creates: /usr/local/bin/k3s
   register: k3s_install
@@ -74,26 +70,18 @@
   until: k3s_install.rc == 0
   become: yes
 
-- name: Liberar porta k3s
-  shell: sudo kill -9 $(sudo lsof -t -i :6443)
-  become: yes
-  tags:
-    - rollback
+# - name: Liberar porta k3s
+#   shell: sudo kill -9 $(sudo lsof -t -i :6443)
+#   become: yes
+#   tags:
+#     - rollback
 
 - name: Aguardar K3s inicializar
   wait_for:
     path: /etc/rancher/k3s/k3s.yaml
     timeout: 300
 
-
-# - name: Liberar porta k3s
-#   shell:  sudo kill -9 $(sudo lsof -t -i :6443)
-#   become: yes
-
-# - name: Subir k3s
-#   shell: k3s server --https-listen-port=6443
-#   become: yes
-
+# REMOVIDO PARA TESTE
 # - name: Garantir que K3s está ativo
 #   systemd:
 #     name: k3s
