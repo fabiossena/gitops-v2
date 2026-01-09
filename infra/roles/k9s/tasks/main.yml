@@ -53,14 +53,22 @@
     group: "{{ ansible_user | default('ubuntu') }}"
     mode: '0755'
 
-- name: Copy k3s kubeconfig to user kubeconfig
+# - name: Copy k3s kubeconfig to user kubeconfig
+#   become: yes
+#   copy:
+#     src: /etc/rancher/k3s/k3s.yaml
+#     dest: "/home/{{ ansible_user | default('ubuntu') }}/.kube/config"
+#     owner: "{{ ansible_user | default('ubuntu') }}"
+#     group: "{{ ansible_user | default('ubuntu') }}"
+#     mode: '0600'
+
+- name: Copy k3s kubeconfig using shell
   become: yes
-  copy:
-    src: /etc/rancher/k3s/k3s.yaml
-    dest: "/home/{{ ansible_user | default('ubuntu') }}/.kube/config"
-    owner: "{{ ansible_user | default('ubuntu') }}"
-    group: "{{ ansible_user | default('ubuntu') }}"
-    mode: '0600'
+  shell: |
+    mkdir -p /home/{{ ansible_user | default('ubuntu') }}/.kube
+    cp /etc/rancher/k3s/k3s.yaml /home/{{ ansible_user | default('ubuntu') }}/.kube/config
+    chown {{ ansible_user | default('ubuntu') }}:{{ ansible_user | default('ubuntu') }} /home/{{ ansible_user | default('ubuntu') }}/.kube/config
+    chmod 600 /home/{{ ansible_user | default('ubuntu') }}/.kube/config
 
 - name: Ensure KUBECONFIG wrapper for user (optional)
   copy:
