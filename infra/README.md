@@ -62,7 +62,6 @@ Antes de executar o ansible instalar o script no servidor destino: (ver se vale 
 ```
 infra\scripts\00-bootstrap.sh (se não rodar o playbook/bootstrap.yml)
 sudo apt install -y python3 python3-apt
-sudo apt install -y iptables iproute2
 ```
 
 Como executar (Ansible)

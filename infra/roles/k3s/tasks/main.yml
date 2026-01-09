@@ -31,6 +31,9 @@
       - curl
       - iptables
       - iproute2
+      - socat
+      - conntrack
+      - util-linux
     state: present
     update_cache: yes
 
