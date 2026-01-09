@@ -1,3 +1,32 @@
+- name: Criar namespace do ArgoCD
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ argocd_namespace }}"
+  become: yes
+
+- name: Instalar ArgoCD via manifest oficial
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('url', 'https://raw.githubusercontent.com/argoproj/argo-cd/' + argocd_version + '/manifests/install.yaml') | from_yaml }}"
+  become: yes
+
+- name: Esperar pods do ArgoCD estarem prontos
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ argocd_namespace }}"
+  register: argocd_pods
+  retries: 10
+  delay: 15
+  until: argocd_pods.resources | selectattr('status.phase','equalto','Running') | list | length == (argocd_pods.resources | length)
+  become: yes
+
+- name: Mostrar pods do ArgoCD
+  debug:
+    msg: "{{ argocd_pods.resources | map(attribute='metadata.name') | list }}"
+
+
 - name: Create ArgoCD namespace
   shell: kubectl create namespace {{ argocd_namespace }}
   args:
