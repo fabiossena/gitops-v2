@@ -2,3 +2,6 @@ argocd_namespace: argocd
 argocd_version: stable
 gitops_repo_url: https://github.com/fabiossena/gitops-v2.git
 gitops_repo_path: infra/gitops/apps
+
+argocd_nodeport: 30080
+kubeconfig_path: "{{ lookup('env', 'HOME') }}/.kube/config"

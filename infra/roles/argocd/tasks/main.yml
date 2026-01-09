@@ -1,4 +1,8 @@
 
+- name: Create ArgoCD namespace - teste
+  shell: |
+    echo {{ kubeconfig_path }}
+
 - name: Create ArgoCD namespace - Ensure kubeconfig is available for root
   shell: |
     sudo mkdir -p /root/.kube
