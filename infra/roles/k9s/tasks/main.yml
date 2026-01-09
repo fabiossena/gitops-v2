@@ -60,7 +60,7 @@
     content: |
       #!/bin/sh
       export KUBECONFIG=/home/{{ ansible_user | default('ubuntu') }}/.kube/config
-      exec /usr/local/bin/k9s "$@"
+      sudo exec /usr/local/bin/k9s "$@"
     owner: "{{ ansible_user | default('ubuntu') }}"
     group: "{{ ansible_user | default('ubuntu') }}"
     mode: '0755'
