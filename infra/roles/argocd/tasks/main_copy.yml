@@ -65,8 +65,17 @@
     msg: |
       ✅ ArgoCD instalado com sucesso!
 
-      URL: https://{{ node_ip.stdout }}:{{ argocd_port.stdout }}
+      URL: https://{{ node_ip.stdout | default('UNKNOWN') }}:{{ argocd_port.stdout | default('30443') }}
       Usuário: admin
-      Senha: {{ argocd_password.stdout }}
+      Senha: {{ argocd_password.stdout | default('UNKNOWN') }}
 
       (Ignore o aviso de certificado)
+
+- name: Debug registered vars if missing access info
+  debug:
+    msg: |
+      --- ARGOCD DEBUG ---
+      argocd_password: {{ argocd_password | default('undefined') }}
+      argocd_port: {{ argocd_port | default('undefined') }}
+      node_ip: {{ node_ip | default('undefined') }}
+  when: (argocd_password.stdout | default('') == '') or (argocd_port.stdout | default('') == '') or (node_ip.stdout | default('') == '')
