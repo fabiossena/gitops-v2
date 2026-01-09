@@ -35,6 +35,12 @@
   tags:
     - rollback
 
+- name: Liberar porta k3s
+  shell:  sudo kill -9 $(sudo lsof -t -i :6443)
+  become: yes
+  tags:
+    - rollback
+
 - name: Instalar pacotes necessários
   apt:
     name:
@@ -74,11 +80,6 @@
   until: k3s_install.rc == 0
   become: yes
 
-
-- name: Liberar porta k3s
-  shell:  sudo kill -9 $(sudo lsof -t -i :6443)
-  become: yes
-
 - name: Aguardar K3s inicializar
   wait_for:
     path: /etc/rancher/k3s/k3s.yaml
@@ -93,17 +94,17 @@
 #   shell: k3s server --https-listen-port=6443
 #   become: yes
 
-- name: Garantir que K3s está ativo
-  systemd:
-    name: k3s
-    state: started
-    enabled: yes
-  register: k3s_start
-  failed_when: k3s_start.status != 0
-  become: yes
+# - name: Garantir que K3s está ativo
+#   systemd:
+#     name: k3s
+#     state: started
+#     enabled: yes
+#   register: k3s_start
+#   failed_when: k3s_start.status != 0
+#   become: yes
 
 - name: Verificar status do K3s
-  shell: k3s kubectl get nodes
+  shell: sudo k3s kubectl get nodes
   register: k3s_status
   retries: 10
   delay: 15
