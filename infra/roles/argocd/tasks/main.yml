@@ -18,6 +18,7 @@
     state: present
     src: "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
     namespace: "{{ argocd_namespace }}"
+    kubeconfig: "{{ ansible_user_home }}/.kube/config"
 
 - name: Patch argocd-server to NodePort
   k8s:
