@@ -1,29 +1,75 @@
-# roles/argocd/tasks/main.yml
 - name: Create ArgoCD namespace
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: Namespace
-    name: "{{ argocd_namespace }}"
-    state: present
-    kubeconfig: "{{ ansible_user_home }}/.kube/config"
+  shell: kubectl create namespace {{ argocd_namespace }}
+  args:
+    creates: /var/lib/rancher/k3s/server/manifests/argocd-ns.yaml
 
-- name: Install ArgoCD manifests
+- name: Install ArgoCD
   template:
     src: argocd-install.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/argocd.yaml
 
-- name: Deploy App-of-Apps
+- name: Deploy App of Apps
   template:
     src: app-of-apps.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
 
-- name: Wait for App-of-Apps sync
-  kubernetes.core.k8s_info:
-    kind: Application
+- name: Install ArgoCD on K3s
+  hosts: k3s_master
+  become: yes
+  vars:
+    argocd_namespace: argocd
+    argocd_nodeport: 30080
+    k3s_manifest_dir: /var/lib/rancher/k3s/server/manifests
+
+- name: Ensure ArgoCD namespace exists
+  k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ argocd_namespace }}"
+    state: present
+
+- name: Apply ArgoCD manifests
+  k8s:
+    state: present
+    src: "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
     namespace: "{{ argocd_namespace }}"
-    name: app-of-apps
-    kubeconfig: "{{ ansible_user_home }}/.kube/config"
-  register: appsync
+
+- name: Patch argocd-server to NodePort
+  k8s:
+    api_version: v1
+    kind: Service
+    name: argocd-server
+    namespace: "{{ argocd_namespace }}"
+    merge_type: strategic
+    definition:
+      spec:
+        type: NodePort
+        ports:
+          - port: 443
+            targetPort: 8080
+            nodePort: "{{ argocd_nodeport }}"
+
+- name: Wait for argocd-server to be ready
+  k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ argocd_namespace }}"
+    label_selectors:
+      - app.kubernetes.io/name=argocd-server
+  register: argocd_pods
+  until: argocd_pods.resources | length > 0 and (argocd_pods.resources[0].status.phase == "Running")
   retries: 20
-  delay: 20
-  until: appsync.resources[0].status.health.status == "Healthy" and appsync.resources[0].status.sync.status == "Synced"
+  delay: 10
+
+- name: Get initial admin password
+  command: kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
+  register: argocd_password
+  changed_when: false
+
+- name: Show ArgoCD access info
+  debug:
+    msg: |
+      ArgoCD installed!
+      URL: https://<NODE-IP>:{{ argocd_nodeport }}
+      Username: admin
+      Password: {{ argocd_password.stdout }}
