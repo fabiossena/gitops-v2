@@ -26,15 +26,29 @@
 
 - name: Instalar K3s (master)
   shell: |
-    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="v1.27.10+k3s1" sh -
+    curl -sfL https://get.k3s.io | sh -
   args:
     creates: /usr/local/bin/k3s
+  register: k3s_install
+  retries: 3
+  delay: 10
+  until: k3s_install is succeeded
+
+- name: Aguardar K3s inicializar
+  wait_for:
+    path: /etc/rancher/k3s/k3s.yaml
+    timeout: 60
+  ignore_errors: true
 
 - name: Garantir que K3s está ativo
   systemd:
     name: k3s
     state: started
     enabled: yes
+  register: k3s_start
+  retries: 3
+  delay: 5
+  until: k3s_start is succeeded
 
 - name: Verificar status do K3s
   shell: k3s kubectl get nodes
