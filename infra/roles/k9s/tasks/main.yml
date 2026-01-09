@@ -41,18 +41,26 @@
   file:
     path: "/home/{{ ansible_user | default('ubuntu') }}/.kube"
     state: directory
-    mode: '0755'
     owner: "{{ ansible_user | default('ubuntu') }}"
     group: "{{ ansible_user | default('ubuntu') }}"
+    mode: '0755'
+
+- name: Ensure bin directory exists for user
+  file:
+    path: "/home/{{ ansible_user | default('ubuntu') }}/bin"
+    state: directory
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    group: "{{ ansible_user | default('ubuntu') }}"
+    mode: '0755'
 
 - name: Copy k3s kubeconfig to user kubeconfig
+  become: yes
   copy:
     src: /etc/rancher/k3s/k3s.yaml
     dest: "/home/{{ ansible_user | default('ubuntu') }}/.kube/config"
     owner: "{{ ansible_user | default('ubuntu') }}"
     group: "{{ ansible_user | default('ubuntu') }}"
     mode: '0600'
-  ignore_errors: yes
 
 - name: Ensure KUBECONFIG wrapper for user (optional)
   copy:
@@ -65,4 +73,3 @@
     group: "{{ ansible_user | default('ubuntu') }}"
     mode: '0755'
   when: ansible_facts['os_family'] == 'Debian'
-  ignore_errors: yes
