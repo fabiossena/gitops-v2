@@ -2,18 +2,11 @@ all:
   children:
     debian:
       hosts:
-        debian_wsl:
+        # 172.23.161.197:
+        localhost:
+          ansible_connection: local
           ansible_user: fabiossena
           ansible_become: true
           ansible_become_method: sudo
-          ansible_connection: local
-          ansible_shell_executable: /bin/bash
-          ansible_python_interpreter: /usr/bin/python3
-          ansible_extra_vars: "-e 'distro=Debian'"
-
-        # 172.23.161.197:
-        #   ansible_user: fabiossena
-        #   ansible_become: true
-        #   ansible_become_method: sudo
           # ansible_python_interpreter pode ser adicionado se Python estiver em caminho não padrão
           

@@ -40,7 +40,14 @@
     state: present
     update_cache: yes
   become: yes
+  when: ansible_virtualization_type != "wsl"
 
+- name: Install base packages
+  apt:
+    name: "{{ base_packages }}"
+    state: present
+    update_cache: yes
+    
 - name: Carregar módulos de kernel necessários
   shell: |
     lsmod | grep -q br_netfilter || modprobe br_netfilter
