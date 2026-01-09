@@ -81,13 +81,13 @@
 
 
 - name: Liberar porta k3s
-  shell:  kill -9 $(lsof -t -i :6443)
+  shell:  sudo kill -9 $(sudo lsof -t -i :6443)
   become: yes
 
 - name: Subir k3s
   shell: k3s server --https-listen-port=6443
   become: yes
-  
+
 # - name: Garantir que K3s está ativo
 #   systemd:
 #     name: k3s
