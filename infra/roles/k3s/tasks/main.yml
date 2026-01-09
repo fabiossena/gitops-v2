@@ -74,6 +74,12 @@
   until: k3s_install.rc == 0
   become: yes
 
+- name: Aguardar K3s inicializar
+  wait_for:
+    path: /etc/rancher/k3s/k3s.yaml
+    timeout: 300
+
+
 - name: Liberar porta k3s
   shell:  kill -9 $(lsof -t -i :6443)
   become: yes
@@ -81,11 +87,7 @@
 - name: Subir k3s
   shell: k3s server --https-listen-port=6443
   become: yes
-# - name: Aguardar K3s inicializar
-#   wait_for:
-#     path: /etc/rancher/k3s/k3s.yaml
-#     timeout: 300
-
+  
 # - name: Garantir que K3s está ativo
 #   systemd:
 #     name: k3s
