@@ -13,14 +13,6 @@
     src: app-of-apps.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
 
-- name: Install ArgoCD on K3s
-  hosts: k3s_master
-  become: yes
-  vars:
-    argocd_namespace: argocd
-    argocd_nodeport: 30080
-    k3s_manifest_dir: /var/lib/rancher/k3s/server/manifests
-
 - name: Ensure ArgoCD namespace exists
   k8s:
     api_version: v1
