@@ -7,6 +7,8 @@
     enabled: no
   ignore_errors: yes
   become: yes
+  tags:
+    - rollback
 
 - name: Rodar script de desinstalação do K3s
   shell: |
@@ -15,6 +17,8 @@
     fi
   ignore_errors: yes
   become: yes
+  tags:
+    - rollback
 
 - name: Remover diretórios antigos do K3s
   file:
@@ -28,6 +32,8 @@
     - /etc/systemd/system/k3s.service.env
   ignore_errors: yes
   become: yes
+  tags:
+    - rollback
 
 - name: Instalar pacotes necessários
   apt:
