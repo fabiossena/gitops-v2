@@ -1,3 +1,4 @@
+# roles/k3s/tasks/main.yml
 - name: Instalar K3s Master - Limpeza Prévia
   hosts: k3s_master
   become: yes
