@@ -2,7 +2,7 @@
   roles:
     - base
 
-- hosts: k3s_master
+- hosts: debian
   roles:
     - k3s
     - argocd

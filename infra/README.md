@@ -71,7 +71,12 @@ Execução normal:
 ```
 ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml --ask-pass --ask-become-pass
 ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/site.yml --ask-pass --ask-become-pass
+```
 
+Verificar
+```
+ansible-playbook -i infra/ansible/inventory/hosts.yaml \
+    infra/site.yml --ask-pass --ask-become-pass --check --diff
 ```
 
 Executar apenas uma etapa (tag):
