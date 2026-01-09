@@ -1,4 +1,3 @@
----
 - name: Setup K3s + ArgoCD + App-of-Apps
   hosts: k3s_master
   become: yes
