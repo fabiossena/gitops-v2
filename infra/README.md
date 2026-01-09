@@ -43,7 +43,7 @@ sudo apt update
 sudo apt install -y software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install -y ansible
-ansible --version
+  ansible --version
 ```
 
 macOS (via Homebrew):
@@ -62,20 +62,20 @@ Como executar (Ansible)
 Execução normal:
 
 ```
-ansible-playbook -i infra/inventory/hosts.yaml playbooks/bootstrap.yml
+ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml
 ```
 
 Executar apenas uma etapa (tag):
 
 ```
-ansible-playbook -i infra/inventory/hosts.yaml infra/playbooks/bootstrap.yml --tags ssh
+ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml --tags ssh
 ```
 
 Rollback (via Ansible):
 
 ```
-ansible-playbook -i infra/inventory/hosts.yaml infra/playbooks/bootstrap.yml \
-  --tasks-from-file infra/roles/base/tasks/rollback.yml --tags rollback
+ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml \
+  --tasks-from-file infra/ansible/roles/base/tasks/rollback.yml --tags rollback
 ```
 
 Exemplos de uso com Terraform
@@ -112,14 +112,14 @@ Escolha `yes` quando solicitado. Isso remove:
 Execute rollback via Terraform/Ansible se quiser manter a infraestrutura base:
 
 ```
-terraform apply -var='ansible_extra_args=--tasks-from-file roles/base/tasks/rollback.yml --tags rollback'
+terraform apply -var='ansible_extra_args=--tasks-from-file infra/ansible/roles/base/tasks/rollback.yml --tags rollback'
 ```
 
 Ou diretamente via Ansible:
 
 ```
-ansible-playbook -i inventory/hosts.yaml playbooks/bootstrap.yml \
-  --tasks-from-file roles/base/tasks/rollback.yml --tags rollback
+ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml \
+  --tasks-from-file infra/ansible/roles/base/tasks/rollback.yml --tags rollback
 ```
 
 Isso:

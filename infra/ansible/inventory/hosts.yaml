@@ -1,6 +1,6 @@
 all:
   children:
-    k8s_nodes:
+    debian:
       hosts:
         172.23.161.197:
           ansible_user: fabiossena
