@@ -1,12 +1,9 @@
-# inventário Ansible para hosts Debian
 all:
   children:
-    debian:               # Grupo de hosts Debian
+    debian:
       hosts:
-        172.23.161.197:  # IP do servidor
-          ansible_user: fabiossena      # Usuário SSH usado para conectar
-          ansible_become: true          # Elevar privilégios (sudo) quando necessário
-          ansible_become_method: sudo   # Método de elevação
-          ansible_python_interpreter: /usr/bin/python3.10
-          # Não defina ansible_become_pass aqui!
-          # Use --ask-become-pass na linha de comando para digitar a senha sudo
+        172.23.161.197:
+          ansible_user: fabiossena
+          ansible_become: true
+          ansible_become_method: sudo
+          # ansible_python_interpreter pode ser adicionado se Python estiver em caminho não padrão
