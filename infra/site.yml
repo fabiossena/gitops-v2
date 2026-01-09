@@ -8,4 +8,4 @@
     - argocd
     - k9s
 
-- import_playbook: ansible/playbooks/bootstrap.yml
+#- import_playbook: ansible/playbooks/bootstrap.yml
