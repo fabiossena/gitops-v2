@@ -1,6 +1,6 @@
 - hosts: all
   roles:
-    - common
+    - base
 
 - hosts: k3s_master
   roles:

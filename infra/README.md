@@ -57,12 +57,20 @@ Configurar inventário
 - Edite `infra/inventory/hosts.yaml` com os IPs/hosts de destino.
 - Se preferir formato INI, há um exemplo em `infra/inventory/OLD_hosts.ini`.
 
+
+Antes de executar o ansible instalar o script no servidor destino:
+```
+infra\scripts\00-bootstrap.sh
+sudo apt install -y python3 python3-apt
+```
+
 Como executar (Ansible)
 
 Execução normal:
 
 ```
 ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml --ask-pass --ask-become-pass
+ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/site.yml --ask-pass --ask-become-pass
 
 ```
 
