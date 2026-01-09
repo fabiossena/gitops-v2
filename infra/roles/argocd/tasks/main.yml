@@ -23,36 +23,35 @@
 #     validate_certs: no 
 
 - name: Patch argocd-server to NodePort
-  k8s:
-    api_version: v1
-    kind: Service
-    name: argocd-server
-    namespace: "{{ argocd_namespace }}"
-    merge_type: strategic-merge
-    definition:
-      spec:
-        type: NodePort
-        ports:
-          - port: 443
-            targetPort: 8080
-            nodePort: "{{ argocd_nodeport }}"
+  shell: |
+    /usr/local/bin/k3s kubectl patch svc argocd-server -n {{ argocd_namespace }} \
+      -p '{"spec":{"type":"NodePort","ports":[{"port":443,"targetPort":8080,"nodePort":{{ argocd_nodeport }}}]}}'
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  ignore_errors: yes
 
 - name: Wait for argocd-server to be ready
-  k8s_info:
-    api_version: v1
-    kind: Pod
-    namespace: "{{ argocd_namespace }}"
-    label_selectors:
-      - app.kubernetes.io/name=argocd-server
-  register: argocd_pods
-  until: argocd_pods.resources | length > 0 and (argocd_pods.resources[0].status.phase == "Running")
+  shell: |
+    /usr/local/bin/k3s kubectl get pods -n {{ argocd_namespace }} \
+      -l app.kubernetes.io/name=argocd-server \
+      -o jsonpath='{.items[0].status.phase}' 2>/dev/null | grep -q Running
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_wait
+  until: argocd_wait.rc == 0
   retries: 20
   delay: 10
+  changed_when: false
 
 - name: Get initial admin password
-  command: kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
+  shell: |
+    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
+      -o jsonpath="{.data.password}" 2>/dev/null | base64 -d
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
   register: argocd_password
   changed_when: false
+  ignore_errors: yes
 
 - name: Show ArgoCD access info
   debug:
