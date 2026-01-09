@@ -26,6 +26,7 @@
     - /var/lib/kubelet
     - /etc/systemd/system/k3s.service
     - /etc/systemd/system/k3s.service.env
+  ignore_errors: yes
   become: yes
 
 - name: Instalar pacotes necessários
