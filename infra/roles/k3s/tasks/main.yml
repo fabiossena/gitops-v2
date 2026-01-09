@@ -1,86 +1,105 @@
 # roles/k3s/tasks/main.yml
 
-- name: Parar K3s se estiver rodando
-  systemd:
-    name: k3s
-    state: stopped
-    enabled: no
-  ignore_errors: yes
-
-- name: Rodar script de desinstalação do K3s
-  shell: |
-    if [ -f /usr/local/bin/k3s-uninstall.sh ]; then
-      /usr/local/bin/k3s-uninstall.sh
-    fi
-  ignore_errors: yes
-
-- name: Remover diretórios antigos do K3s
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /etc/rancher/k3s
-    - /var/lib/rancher/k3s
-    - /var/lib/kubelet
-    - /etc/systemd/system/k3s.service
-    - /etc/systemd/system/k3s.service.env
-
-- name: Instalar pacotes necessários
-  apt:
-    name:
-      - curl
-      - iptables
-      - iproute2
-      - socat
-      - conntrack
-      - util-linux
-    state: present
-    update_cache: yes
-
-- name: Carregar módulos de kernel necessários
+- hosts: k3s_master
   become: yes
-  shell: |
-    lsmod | grep -q br_netfilter || modprobe br_netfilter
-    lsmod | grep -q overlay || modprobe overlay
+  gather_facts: yes
+  tasks:
 
-- name: Aplicar sysctl
-  become: yes
-  shell: sysctl --system
+    - name: Pré-check: validar ambiente
+      shell: |
+        if [ "$(id -u)" -ne 0 ]; then
+          echo "Erro: este playbook deve rodar como root"; exit 1
+        fi
+        systemctl --version >/dev/null || (echo "Erro: systemd não encontrado"; exit 1)
+        lsmod | grep -q br_netfilter || echo "Aviso: br_netfilter não carregado"
+        lsmod | grep -q overlay || echo "Aviso: overlay não carregado"
+      register: precheck
+      failed_when: "'Erro' in precheck.stdout"
 
-- name: Instalar K3s (master)
-  become: yes
-  shell: |
-    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="v1.27.10+k3s1" sh -
-  args:
-    creates: /usr/local/bin/k3s
-  register: k3s_install
-  retries: 3
-  delay: 10
-  until: k3s_install.rc == 0
+    - name: Parar K3s se estiver rodando
+      systemd:
+        name: k3s
+        state: stopped
+        enabled: no
+      ignore_errors: yes
 
-- name: Aguardar K3s inicializar
-  wait_for:
-    path: /etc/rancher/k3s/k3s.yaml
-    timeout: 300
+    - name: Rodar script de desinstalação do K3s
+      shell: |
+        if [ -f /usr/local/bin/k3s-uninstall.sh ]; then
+          /usr/local/bin/k3s-uninstall.sh
+        fi
+      ignore_errors: yes
 
-- name: Garantir que K3s está ativo
-  systemd:
-    name: k3s
-    state: started
-    enabled: yes
-  register: k3s_start
-  failed_when: k3s_start.status != 0
-  # retries: 3
-  # delay: 5
-  # until: k3s_start.rc == 0
+    - name: Remover diretórios antigos do K3s
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/rancher/k3s
+        - /var/lib/rancher/k3s
+        - /var/lib/kubelet
+        - /etc/systemd/system/k3s.service
+        - /etc/systemd/system/k3s.service.env
 
-- name: Verificar status do K3s
-  shell: k3s kubectl get nodes
-  register: k3s_status
-  retries: 10
-  delay: 15
-  until: "'Ready' in k3s_status.stdout"
+    - name: Instalar pacotes necessários
+      apt:
+        name:
+          - curl
+          - iptables
+          - iproute2
+          - socat
+          - conntrack
+          - util-linux
+        state: present
+        update_cache: yes
 
-- name: Mostrar status final do cluster
-  debug:
-    msg: "{{ k3s_status.stdout }}"
+    - name: Carregar módulos de kernel necessários
+      shell: |
+        modprobe -a br_netfilter overlay
+      args:
+        warn: false
+
+    - name: Aplicar sysctl necessários para K3s
+      sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: yes
+      loop:
+        - { key: net.bridge.bridge-nf-call-iptables, value: 1 }
+        - { key: net.bridge.bridge-nf-call-ip6tables, value: 1 }
+        - { key: net.ipv4.ip_forward, value: 1 }
+
+    - name: Instalar K3s (master)
+      shell: |
+        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="v1.27.10+k3s1" sh -
+      args:
+        creates: /usr/local/bin/k3s
+      register: k3s_install
+      retries: 3
+      delay: 10
+      until: k3s_install.rc == 0
+
+    - name: Aguardar K3s inicializar
+      wait_for:
+        path: /etc/rancher/k3s/k3s.yaml
+        timeout: 300
+
+    - name: Garantir que K3s está ativo
+      systemd:
+        name: k3s
+        state: started
+        enabled: yes
+      register: k3s_start
+      failed_when: k3s_start.failed
+
+    - name: Verificar status do K3s
+      shell: k3s kubectl get nodes
+      register: k3s_status
+      retries: 10
+      delay: 15
+      until: "'Ready' in k3s_status.stdout"
+
+    - name: Mostrar status final do cluster
+      debug:
+        msg: "{{ k3s_status.stdout }}"
