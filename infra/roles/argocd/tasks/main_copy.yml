@@ -1,94 +1,72 @@
+
+- name: Create ArgoCD namespace - teste1
+  debug:
+    msg: "kubeconfig_path = {{ kubeconfig_path }}"
+
+- name: Create ArgoCD namespace - teste2
+  shell: "ls {{ kubeconfig_path }}"
+  register: kube_ls
+
+- name: Show ls result
+  debug:
+    var: kube_ls.stdout
+    
+
+- name: Create ArgoCD namespace - Ensure kubeconfig is available for root
+  shell: |
+    sudo mkdir -p /root/.kube
+    sudo cp ~/.kube/config /root/.kube/config
+
 - name: Create ArgoCD namespace
-  shell: kubectl create namespace {{ argocd_namespace }}
-  args:
-    creates: /var/lib/rancher/k3s/server/manifests/argocd-ns.yaml
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ argocd_namespace }}"
+    state: present
 
 - name: Install ArgoCD
-  template:
-    src: argocd-install.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/argocd.yaml
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ role_path }}/files/argocd-install.yaml"
+    namespace: "{{ argocd_namespace }}"
 
-- name: Deploy App of Apps
-  template:
-    src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
+- name: Patch argocd-server to NodePort
+  kubernetes.core.k8s:
+    state: patched
+    kind: Service
+    name: argocd-server
+    namespace: "{{ argocd_namespace }}"
+    definition:
+      spec:
+        type: NodePort
+        ports:
+          - name: https
+            port: 443
+            targetPort: 8080
+            nodePort: "{{ argocd_nodeport }}"
 
-- name: Wait for ArgoCD namespace creation
-  shell: |
-    /usr/local/bin/k3s kubectl get ns {{ argocd_namespace }}
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  register: argocd_ns_wait
-  until: argocd_ns_wait.rc == 0
-  retries: 10
-  delay: 5
-  changed_when: false
-  ignore_errors: yes
-
-- name: Show ArgoCD namespace status
-  debug:
-    msg: "ArgoCD namespace {{ argocd_namespace }} is ready for deployment"
-
-- name: Wait for ArgoCD server secret to be created
-  shell: |
-    /usr/local/bin/k3s kubectl get secret -n {{ argocd_namespace }} argocd-initial-admin-secret 2>/dev/null
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  register: argocd_secret_wait
-  until: argocd_secret_wait.rc == 0
-  retries: 30
+- name: Wait for ArgoCD server to be ready
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ argocd_namespace }}"
+    label_selectors:
+      - app.kubernetes.io/name=argocd-server
+  register: argocd_pods
+  until: argocd_pods.resources | length > 0 and
+         argocd_pods.resources[0].status.containerStatuses[0].ready
+  retries: 5
   delay: 10
-  changed_when: false
-  ignore_errors: yes
 
-- name: Get ArgoCD initial admin password
+- name: Get initial admin password
   shell: |
-    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
+    kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
       -o jsonpath="{.data.password}" | base64 -d
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  register: argocd_password
+  register: argocd_admin_password
   changed_when: false
-  ignore_errors: yes
 
-- name: Get ArgoCD service NodePort
-  shell: |
-    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} get svc argocd-server \
-      -o jsonpath='{.spec.ports[?(@.name=="https")].nodePort}' 2>/dev/null || echo "LoadBalancer or pending"
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  register: argocd_nodeport_check
-  changed_when: false
-  ignore_errors: yes
-
-- name: Get node IP address
-  shell: |
-    /usr/local/bin/k3s kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  register: node_ip
-  changed_when: false
-  ignore_errors: yes
-
-- name: Display ArgoCD Access Information
+- name: Show ArgoCD access info
   debug:
-    msg: |
-      ╔════════════════════════════════════════════════════════╗
-      ║         🎯 ArgoCD Installation Complete! 🎯            ║
-      ╠════════════════════════════════════════════════════════╣
-      ║ URL:        https://{{ node_ip.stdout }}:{{ argocd_nodeport_check.stdout }}
-      ║ Username:   admin
-      ║ Password:   {{ argocd_password.stdout }}
-      ╠════════════════════════════════════════════════════════╣
-      ║ Namespace:  {{ argocd_namespace }}
-      ║ Version:    {{ argocd_version }}
-      ╚════════════════════════════════════════════════════════╝
-      
-      To access ArgoCD:
-      1. Open browser: https://{{ node_ip.stdout }}:{{ argocd_nodeport_check.stdout }}
-      2. Login with admin / {{ argocd_password.stdout }}
-      3. Ignore self-signed certificate warning
-      
-      To retrieve password later:
-      k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-  when: argocd_password.stdout is defined and argocd_password.stdout != ""
+    msg:
+      - "ArgoCD UI: https://<NODE-IP>:{{ argocd_nodeport }}"
+      - "User: admin"
+      - "Password: {{ argocd_admin_password.stdout }}"
