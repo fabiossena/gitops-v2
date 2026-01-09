@@ -58,10 +58,11 @@ Configurar inventário
 - Se preferir formato INI, há um exemplo em `infra/inventory/OLD_hosts.ini`.
 
 
-Antes de executar o ansible instalar o script no servidor destino:
+Antes de executar o ansible instalar o script no servidor destino: (ver se vale a pena juntar com o playbook/bootstrap.yml exceto o python que é requisito)
 ```
-infra\scripts\00-bootstrap.sh
+infra\scripts\00-bootstrap.sh (se não rodar o playbook/bootstrap.yml)
 sudo apt install -y python3 python3-apt
+sudo apt install -y iptables iproute2
 ```
 
 Como executar (Ansible)
@@ -82,6 +83,7 @@ ansible-playbook -i infra/ansible/inventory/hosts.yaml \
 Executar apenas uma etapa (tag):
 
 ```
+ansible-playbook -i infra/ansible/inventory/hosts.yaml     infra/site.yml --ask-pass --ask-become-pass --tags k3s
 ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml --tags ssh
 ```
 
