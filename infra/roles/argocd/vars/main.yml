@@ -1,0 +1,3 @@
+argocd_namespace: argocd
+argocd_nodeport: 30080
+kubeconfig_path: "{{ lookup('env', 'HOME') }}/.kube/config"
