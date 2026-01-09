@@ -1,32 +1,3 @@
-- name: Criar namespace do ArgoCD
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: Namespace
-    name: "{{ argocd_namespace }}"
-  become: yes
-
-- name: Instalar ArgoCD via manifest oficial
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('url', 'https://raw.githubusercontent.com/argoproj/argo-cd/' + argocd_version + '/manifests/install.yaml') | from_yaml }}"
-  become: yes
-
-- name: Esperar pods do ArgoCD estarem prontos
-  kubernetes.core.k8s_info:
-    api_version: v1
-    kind: Pod
-    namespace: "{{ argocd_namespace }}"
-  register: argocd_pods
-  retries: 10
-  delay: 15
-  until: argocd_pods.resources | selectattr('status.phase','equalto','Running') | list | length == (argocd_pods.resources | length)
-  become: yes
-
-- name: Mostrar pods do ArgoCD
-  debug:
-    msg: "{{ argocd_pods.resources | map(attribute='metadata.name') | list }}"
-
-
 - name: Create ArgoCD namespace
   shell: kubectl create namespace {{ argocd_namespace }}
   args:
@@ -42,50 +13,18 @@
     src: app-of-apps.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
 
-# - name: Apply ArgoCD manifests
-#   become: yes
-#   k8s:
-#     state: present
-#     src: "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
-#     namespace: "{{ argocd_namespace }}"
-#     kubeconfig: "{{ ansible_user_home }}/.kube/config"
-#     validate_certs: no 
+- name: Wait for ArgoCD namespace creation
+  shell: |
+    /usr/local/bin/k3s kubectl get ns {{ argocd_namespace }}
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_ns_wait
+  until: argocd_ns_wait.rc == 0
+  retries: 10
+  delay: 5
+  changed_when: false
+  ignore_errors: yes
 
-# - name: Patch argocd-server to NodePort
-#   shell: |
-#     /usr/local/bin/k3s kubectl patch svc argocd-server -n {{ argocd_namespace }} \
-#       -p '{"spec":{"type":"NodePort","ports":[{"port":443,"targetPort":8080,"nodePort":{{ argocd_nodeport }}}]}}'
-#   environment:
-#     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-#   ignore_errors: yes
-
-# - name: Wait for argocd-server to be ready
-#   shell: |
-#     /usr/local/bin/k3s kubectl get pods -n {{ argocd_namespace }} \
-#       -l app.kubernetes.io/name=argocd-server \
-#       -o jsonpath='{.items[0].status.phase}' 2>/dev/null | grep -q Running
-#   environment:
-#     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-#   register: argocd_wait
-#   until: argocd_wait.rc == 0
-#   retries: 20
-#   delay: 10
-#   changed_when: false
-
-# - name: Get initial admin password
-#   shell: |
-#     /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
-#       -o jsonpath="{.data.password}" 2>/dev/null | base64 -d
-#   environment:
-#     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-#   register: argocd_password
-#   changed_when: false
-#   ignore_errors: yes
-
-# - name: Show ArgoCD access info
-#   debug:
-#     msg: |
-#       ArgoCD installed!
-#       URL: https://<NODE-IP>:{{ argocd_nodeport }}
-#       Username: admin
-#       Password: {{ argocd_password.stdout }}
+- name: Show ArgoCD namespace status
+  debug:
+    msg: "ArgoCD namespace {{ argocd_namespace }} is ready for deployment"
