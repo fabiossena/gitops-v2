@@ -1,17 +1,17 @@
 - hosts: all
   become: yes
-  vars:
-    k3s_version: "v1.27.10+k3s1"
-    argocd_namespace: "argocd"
-    argocd_server_nodeport: 30007
-    ansible_user_home: "/home/{{ ansible_user | default('ubuntu') }}"
   roles:
     - base
 
 - hosts: debian
   roles:
-    - k3s
-    - argocd
-    - k9s
+    - role: k3s
+    - role: argocd
+      vars:
+        k3s_version: "v1.27.10+k3s1"
+        argocd_namespace: "argocd"
+        argocd_server_nodeport: 30007
+        ansible_user_home: "/home/{{ ansible_user | default('ubuntu') }}"
+    - role: k9s
 
 #- import_playbook: ansible/playbooks/bootstrap.yml
