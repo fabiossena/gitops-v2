@@ -26,29 +26,56 @@ sudo apt install -y terraform
 terraform version
 ```
 
+Instalar Ansible
+
+Windows (via pip):
+
+```
+python -m pip install --upgrade pip
+python -m pip install ansible
+ansible --version
+```
+
+Debian / Ubuntu:
+
+```
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install -y ansible
+ansible --version
+```
+
+macOS (via Homebrew):
+
+```
+brew install ansible
+ansible --version
+```
+
 Configurar inventário
-- Edite `inventory/hosts.yaml` com os IPs/hosts de destino.
-- Se preferir formato INI, há um exemplo em `inventory/OLD_hosts.ini`.
+- Edite `infra/inventory/hosts.yaml` com os IPs/hosts de destino.
+- Se preferir formato INI, há um exemplo em `infra/inventory/OLD_hosts.ini`.
 
 Como executar (Ansible)
 
 Execução normal:
 
 ```
-ansible-playbook -i inventory/hosts.yaml playbooks/bootstrap.yml
+ansible-playbook -i infra/inventory/hosts.yaml playbooks/bootstrap.yml
 ```
 
 Executar apenas uma etapa (tag):
 
 ```
-ansible-playbook -i inventory/hosts.yaml playbooks/bootstrap.yml --tags ssh
+ansible-playbook -i infra/inventory/hosts.yaml infra/playbooks/bootstrap.yml --tags ssh
 ```
 
 Rollback (via Ansible):
 
 ```
-ansible-playbook -i inventory/hosts.yaml playbooks/bootstrap.yml \
-  --tasks-from-file roles/base/tasks/rollback.yml --tags rollback
+ansible-playbook -i infra/inventory/hosts.yaml infra/playbooks/bootstrap.yml \
+  --tasks-from-file infra/roles/base/tasks/rollback.yml --tags rollback
 ```
 
 Exemplos de uso com Terraform
@@ -65,12 +92,50 @@ Executar apenas uma etapa do Ansible através do `ansible_extra_args`:
 terraform apply -var='ansible_extra_args=--tags ssh'
 ```
 
-Executar rollback via Terraform (passando args para Ansible):
+Limpeza e Destruição
+
+**Opção 1: Destruir tudo (VMs, networks, K3s, ArgoCD)**
+
+Use `terraform destroy` para remover toda a infraestrutura gerenciada por Terraform:
+
+```
+terraform destroy
+```
+
+Escolha `yes` quando solicitado. Isso remove:
+- Máquinas virtuais/hosts
+- Redes e configurações de rede
+- Dados de estado
+
+**Opção 2: Rollback parcial (remove K3s e ArgoCD, mantém SO)**
+
+Execute rollback via Terraform/Ansible se quiser manter a infraestrutura base:
 
 ```
 terraform apply -var='ansible_extra_args=--tasks-from-file roles/base/tasks/rollback.yml --tags rollback'
 ```
 
+Ou diretamente via Ansible:
+
+```
+ansible-playbook -i inventory/hosts.yaml playbooks/bootstrap.yml \
+  --tasks-from-file roles/base/tasks/rollback.yml --tags rollback
+```
+
+Isso:
+- Remove ArgoCD namespace
+- Executa `k3s-uninstall.sh` (limpeza oficial do K3s)
+- Desativa SSH
+- Remove pacotes base
+
+**Opção 3: Apenas uninstalar K3s (manual)**
+
+Se estiver logado no host destino:
+
+```
+/usr/local/bin/k3s-uninstall.sh
+```
+
 Observações
-- Ajuste `inventory/hosts.yaml` antes de executar as playbooks.
+- Ajuste `infra/inventory/hosts.yaml` antes de executar as playbooks.
 - Verifique permissões/SSH entre a máquina de controle e os nós gerenciados.

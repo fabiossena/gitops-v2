@@ -1,3 +1,23 @@
+- name: Remove ArgoCD namespace
+  kubernetes.core.k8s:
+    state: absent
+    kind: Namespace
+    name: argocd
+  ignore_errors: true
+  tags: [rollback, argocd]
+
+- name: Uninstall K3s
+  shell: |
+    /usr/local/bin/k3s-uninstall.sh
+  ignore_errors: true
+  register: k3s_uninstall
+  tags: [rollback, k3s]
+
+- name: Show K3s uninstall output
+  debug:
+    var: k3s_uninstall.stdout_lines
+  tags: [rollback, k3s]
+
 - name: Stop and disable SSH
   service:
     name: ssh
