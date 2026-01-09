@@ -1,5 +1,5 @@
 - name: Verificar se k9s já está instalado
-  command: k9s version
+  command: sudo k9s version
   register: k9s_check
   ignore_errors: true
   changed_when: false
@@ -36,3 +36,33 @@
     path: /tmp/k9s.tar.gz
     state: absent
   when: k9s_check.rc != 0
+
+- name: Ensure user kube directory exists
+  file:
+    path: "/home/{{ ansible_user | default('ubuntu') }}/.kube"
+    state: directory
+    mode: '0755'
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    group: "{{ ansible_user | default('ubuntu') }}"
+
+- name: Copy k3s kubeconfig to user kubeconfig
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "/home/{{ ansible_user | default('ubuntu') }}/.kube/config"
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    group: "{{ ansible_user | default('ubuntu') }}"
+    mode: '0600'
+  ignore_errors: yes
+
+- name: Ensure KUBECONFIG wrapper for user (optional)
+  copy:
+    dest: "/home/{{ ansible_user | default('ubuntu') }}/bin/k9s-with-kubeconfig"
+    content: |
+      #!/bin/sh
+      export KUBECONFIG=/home/{{ ansible_user | default('ubuntu') }}/.kube/config
+      exec /usr/local/bin/k9s "$@"
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    group: "{{ ansible_user | default('ubuntu') }}"
+    mode: '0755'
+  when: ansible_facts['os_family'] == 'Debian'
+  ignore_errors: yes
