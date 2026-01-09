@@ -79,9 +79,9 @@
       ╔══════════════════════════════════════════════════════════╗
       ║          🎯 ArgoCD Installation Complete! 🎯             ║
       ╠══════════════════════════════════════════════════════════╣
-      ║ URL:        https://{{ node_ip.stdout }}:{{ argocd_port.stdout }}
+      ║ URL:        https://{{ node_ip.stdout | default('UNKNOWN') }}:{{ argocd_port.stdout | default('30443') }}
       ║ Username:   admin
-      ║ Password:   {{ argocd_password.stdout }}
+      ║ Password:   {{ argocd_password.stdout | default('UNKNOWN') }}
       ╠══════════════════════════════════════════════════════════╣
       ║ Namespace:  {{ argocd_namespace }}
       ║ Version:    {{ argocd_version }}
@@ -94,4 +94,13 @@
       
       To retrieve password later:
       k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-  when: argocd_password.stdout is defined and argocd_password.stdout != ""
+  # Always show best-effort info; values use fallbacks when missing.
+
+- name: Debug ArgoCD registered vars when missing
+  debug:
+    msg: |
+      --- ARGOCD DEBUG ---
+      argocd_password: {{ argocd_password | default('undefined') }}
+      argocd_port: {{ argocd_port | default('undefined') }}
+      node_ip: {{ node_ip | default('undefined') }}
+  when: (argocd_password.stdout | default('') == '') or (argocd_port.stdout | default('') == '') or (node_ip.stdout | default('') == '')
