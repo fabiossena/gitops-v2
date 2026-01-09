@@ -13,6 +13,7 @@
         argocd_server_nodeport: 30007
         ansible_user_home: "/home/{{ ansible_user | default('ubuntu') }}"
         k3s_manifest_dir: /var/lib/rancher/k3s/server/manifests
+        argocd_nodeport: 30007
     - role: k9s
 
 #- import_playbook: ansible/playbooks/bootstrap.yml
