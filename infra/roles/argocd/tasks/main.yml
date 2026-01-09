@@ -30,17 +30,23 @@
   delay: 5
   changed_when: false
 
-- name: Wait for ArgoCD server secret
+- name: Wait for ArgoCD pods to be ready
   shell: |
-    /usr/local/bin/k3s kubectl get secret -n {{ argocd_namespace }} argocd-initial-admin-secret 2>/dev/null
+    /usr/local/bin/k3s kubectl get pods -n {{ argocd_namespace }} \
+      -l app.kubernetes.io/name=argocd-server \
+      -o jsonpath='{.items[0].status.phase}' 2>/dev/null | grep -q Running
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  register: argocd_secret_check
-  until: argocd_secret_check.rc == 0
+  register: argocd_pod_check
+  until: argocd_pod_check.rc == 0
   retries: 30
   delay: 10
   changed_when: false
   ignore_errors: yes
+
+- name: Wait a few more seconds for secret to be ready
+  pause:
+    seconds: 5
 
 - name: Get ArgoCD initial admin password
   shell: |
