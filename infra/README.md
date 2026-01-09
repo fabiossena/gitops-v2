@@ -62,7 +62,8 @@ Como executar (Ansible)
 Execução normal:
 
 ```
-ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml
+ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml --ask-pass --ask-become-pass
+
 ```
 
 Executar apenas uma etapa (tag):

@@ -7,5 +7,6 @@ all:
           ansible_user: fabiossena      # Usuário SSH usado para conectar
           ansible_become: true          # Elevar privilégios (sudo) quando necessário
           ansible_become_method: sudo   # Método de elevação
+          ansible_python_interpreter: /usr/bin/python3.10
           # Não defina ansible_become_pass aqui!
           # Use --ask-become-pass na linha de comando para digitar a senha sudo
