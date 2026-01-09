@@ -2,7 +2,6 @@
   shell: kubectl create namespace {{ argocd_namespace }}
   args:
     creates: /var/lib/rancher/k3s/server/manifests/argocd-ns.yaml
-  ignore_errors: true
 
 - name: Install ArgoCD
   template:
