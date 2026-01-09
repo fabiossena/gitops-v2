@@ -1,39 +1,39 @@
 # roles/k3s/tasks/main.yml
 
-- name: Parar K3s se estiver rodando
-  systemd:
-    name: k3s
-    state: stopped
-    enabled: no
-  ignore_errors: yes
-  become: yes
-  tags:
-    - rollback
+# - name: Parar K3s se estiver rodando
+#   systemd:
+#     name: k3s
+#     state: stopped
+#     enabled: no
+#   ignore_errors: yes
+#   become: yes
+#   tags:
+#     - rollback
 
-- name: Rodar script de desinstalação do K3s
-  shell: |
-    if [ -f /usr/local/bin/k3s-uninstall.sh ]; then
-      /usr/local/bin/k3s-uninstall.sh
-    fi
-  ignore_errors: yes
-  become: yes
-  tags:
-    - rollback
+# - name: Rodar script de desinstalação do K3s
+#   shell: |
+#     if [ -f /usr/local/bin/k3s-uninstall.sh ]; then
+#       /usr/local/bin/k3s-uninstall.sh
+#     fi
+#   ignore_errors: yes
+#   become: yes
+#   tags:
+#     - rollback
 
-- name: Remover diretórios antigos do K3s
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /etc/rancher/k3s
-    - /var/lib/rancher/k3s
-    - /var/lib/kubelet
-    - /etc/systemd/system/k3s.service
-    - /etc/systemd/system/k3s.service.env
-  ignore_errors: yes
-  become: yes
-  tags:
-    - rollback
+# - name: Remover diretórios antigos do K3s
+#   file:
+#     path: "{{ item }}"
+#     state: absent
+#   loop:
+#     - /etc/rancher/k3s
+#     - /var/lib/rancher/k3s
+#     - /var/lib/kubelet
+#     - /etc/systemd/system/k3s.service
+#     - /etc/systemd/system/k3s.service.env
+#   ignore_errors: yes
+#   become: yes
+#   tags:
+#     - rollback
 
 - name: Instalar pacotes necessários
   apt:
