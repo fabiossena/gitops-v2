@@ -32,15 +32,11 @@
 
 - name: Wait for ArgoCD pods to be ready
   shell: |
-    /usr/local/bin/k3s kubectl get pods -n {{ argocd_namespace }} \
-      -l app.kubernetes.io/name=argocd-server \
-      -o jsonpath='{.items[0].status.phase}' 2>/dev/null | grep -q Running
+    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} wait --for=condition=available \
+      deployment/argocd-server --timeout=300s
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  register: argocd_pod_check
-  until: argocd_pod_check.rc == 0
-  retries: 30
-  delay: 10
+  register: argocd_deploy_wait
   changed_when: false
   ignore_errors: yes
 

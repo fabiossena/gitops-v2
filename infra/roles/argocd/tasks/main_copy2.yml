@@ -15,7 +15,7 @@
 - name: Create ArgoCD namespace - Ensure kubeconfig is available for root
   shell: |
     sudo mkdir -p /root/.kube
-    sudo cp ~/.kube/config /root/.kube/config
+    sudo cp {{ kubeconfig_path }} /root/.kube/config
 
 - name: Create ArgoCD namespace
   kubernetes.core.k8s:
