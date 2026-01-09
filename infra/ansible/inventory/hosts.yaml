@@ -1,8 +1,11 @@
+# inventário Ansible para hosts Debian
 all:
   children:
-    debian:
+    debian:               # Grupo de hosts Debian
       hosts:
-        172.23.161.197:
-          ansible_user: fabiossena
-          ansible_become: true
-          ansible_become_method: sudo
+        172.23.161.197:  # IP do servidor
+          ansible_user: fabiossena      # Usuário SSH usado para conectar
+          ansible_become: true          # Elevar privilégios (sudo) quando necessário
+          ansible_become_method: sudo   # Método de elevação
+          # Não defina ansible_become_pass aqui!
+          # Use --ask-become-pass na linha de comando para digitar a senha sudo
