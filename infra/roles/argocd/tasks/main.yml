@@ -1,14 +1,155 @@
-- name: Create ArgoCD namespace
-  shell: kubectl create namespace {{ argocd_namespace }}
-  args:
-    creates: /var/lib/rancher/k3s/server/manifests/argocd-ns.yaml
+---
+- name: Setup K3s + ArgoCD + App-of-Apps
+  hosts: k3s_master
+  become: yes
+  vars:
+    k3s_version: "v1.27.10+k3s1"
+    argocd_namespace: "argocd"
+    argocd_server_nodeport: 30007   # Porta para acessar UI externamente
+    app_of_apps_repo: "https://github.com/seu-repo/app-of-apps.git"
+    ansible_user_home: "/home/{{ ansible_user | default('ubuntu') }}"
 
-- name: Install ArgoCD
-  template:
-    src: argocd-install.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/argocd.yaml
+  tasks:
 
-- name: Deploy App of Apps
-  template:
-    src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
+  ##############################
+  # K3s Installation
+  ##############################
+
+  - name: Stop K3s if running
+    systemd:
+      name: k3s
+      state: stopped
+      enabled: no
+    ignore_errors: yes
+
+  - name: Uninstall previous K3s
+    shell: |
+      if [ -f /usr/local/bin/k3s-uninstall.sh ]; then
+        /usr/local/bin/k3s-uninstall.sh
+      fi
+    ignore_errors: yes
+
+  - name: Remove old K3s directories
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop:
+      - /etc/rancher/k3s
+      - /var/lib/rancher/k3s
+      - /var/lib/kubelet
+      - /etc/systemd/system/k3s.service
+      - /etc/systemd/system/k3s.service.env
+
+  - name: Install required packages
+    apt:
+      name:
+        - curl
+        - iptables
+        - iproute2
+        - socat
+        - conntrack
+        - util-linux
+      state: present
+      update_cache: yes
+
+  - name: Load kernel modules
+    shell: |
+      lsmod | grep -q br_netfilter || modprobe br_netfilter
+      lsmod | grep -q overlay || modprobe overlay
+
+  - name: Apply sysctl settings
+    shell: sysctl --system
+
+  - name: Install K3s master
+    shell: |
+      curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -
+    args:
+      creates: /usr/local/bin/k3s
+    register: k3s_install
+    retries: 3
+    delay: 10
+    until: k3s_install.rc == 0
+
+  - name: Wait for K3s kubeconfig
+    wait_for:
+      path: /etc/rancher/k3s/k3s.yaml
+      timeout: 300
+
+  - name: Ensure K3s is started
+    systemd:
+      name: k3s
+      state: started
+      enabled: yes
+
+  - name: Copy kubeconfig for user
+    copy:
+      src: /etc/rancher/k3s/k3s.yaml
+      dest: "{{ ansible_user_home }}/.kube/config"
+      owner: "{{ ansible_user | default('ubuntu') }}"
+      group: "{{ ansible_user | default('ubuntu') }}"
+      mode: '0600'
+    become: yes
+
+  ##############################
+  # ArgoCD Installation
+  ##############################
+
+  - name: Create ArgoCD namespace
+    kubernetes.core.k8s:
+      api_version: v1
+      kind: Namespace
+      name: "{{ argocd_namespace }}"
+      state: present
+      kubeconfig: "{{ ansible_user_home }}/.kube/config"
+
+  - name: Install ArgoCD manifests
+    template:
+      src: argocd-install.yaml.j2
+      dest: /var/lib/rancher/k3s/server/manifests/argocd.yaml
+
+  - name: Patch ArgoCD server to NodePort
+    kubernetes.core.k8s:
+      state: patched
+      kind: Service
+      name: argocd-server
+      namespace: "{{ argocd_namespace }}"
+      merge_type: strategic-merge
+      definition:
+        spec:
+          type: NodePort
+          ports:
+            - port: 443
+              nodePort: "{{ argocd_server_nodeport }}"
+      kubeconfig: "{{ ansible_user_home }}/.kube/config"
+
+  - name: Wait for ArgoCD server pod to be ready
+    kubernetes.core.k8s_info:
+      kind: Pod
+      namespace: "{{ argocd_namespace }}"
+      label_selectors:
+        - app.kubernetes.io/name=argocd-server
+      kubeconfig: "{{ ansible_user_home }}/.kube/config"
+    register: argocd_pods
+    retries: 20
+    delay: 15
+    until: argocd_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
+
+  ##############################
+  # App-of-Apps Deployment
+  ##############################
+
+  - name: Deploy App-of-Apps
+    template:
+      src: app-of-apps.yaml.j2
+      dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
+
+  - name: Wait for App-of-Apps sync
+    kubernetes.core.k8s_info:
+      kind: Application
+      namespace: "{{ argocd_namespace }}"
+      name: app-of-apps
+      kubeconfig: "{{ ansible_user_home }}/.kube/config"
+    register: appsync
+    retries: 20
+    delay: 20
+    until: appsync.resources[0].status.health.status == "Healthy" and appsync.resources[0].status.sync.status == "Synced"
