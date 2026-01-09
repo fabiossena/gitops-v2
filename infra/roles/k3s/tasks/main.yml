@@ -1,4 +1,5 @@
 # roles/k3s/tasks/main.yml
+
 - name: Parar K3s se estiver rodando
   systemd:
     name: k3s
@@ -24,21 +25,29 @@
     - /etc/systemd/system/k3s.service
     - /etc/systemd/system/k3s.service.env
 
+- name: Instalar pacotes necessários
+  apt:
+    name:
+      - curl
+      - iptables
+      - iproute2
+    state: present
+    update_cache: yes
+
 - name: Instalar K3s (master)
   shell: |
-    curl -sfL https://get.k3s.io | sh -
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="v1.27.10+k3s1" sh -
   args:
     creates: /usr/local/bin/k3s
   register: k3s_install
   retries: 3
   delay: 10
-  until: k3s_install is succeeded
+  until: k3s_install.rc == 0
 
 - name: Aguardar K3s inicializar
   wait_for:
     path: /etc/rancher/k3s/k3s.yaml
-    timeout: 60
-  ignore_errors: true
+    timeout: 300
 
 - name: Garantir que K3s está ativo
   systemd:
@@ -48,12 +57,14 @@
   register: k3s_start
   retries: 3
   delay: 5
-  until: k3s_start is succeeded
+  until: k3s_start.rc == 0
 
 - name: Verificar status do K3s
   shell: k3s kubectl get nodes
   register: k3s_status
-  failed_when: "'Ready' not in k3s_status.stdout"
+  retries: 10
+  delay: 15
+  until: "'Ready' in k3s_status.stdout"
 
 - name: Mostrar status final do cluster
   debug:
