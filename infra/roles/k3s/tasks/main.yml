@@ -5,7 +5,7 @@
   gather_facts: yes
   tasks:
 
-    - name: Pré-check: validar ambiente
+    - name: Pré-check -  validar ambiente
       shell: |
         if [ "$(id -u)" -ne 0 ]; then
           echo "Erro: este playbook deve rodar como root"; exit 1
