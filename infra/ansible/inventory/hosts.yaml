@@ -2,15 +2,15 @@ all:
   children:
     debian:
       hosts:
-        wsl2:
+        debian_wsl:
           ansible_user: fabiossena
           ansible_become: true
           ansible_become_method: sudo
           ansible_connection: local
           ansible_shell_executable: /bin/bash
           ansible_python_interpreter: /usr/bin/python3
-          ansible_host: wsl
           ansible_extra_vars: "-e 'distro=Debian'"
+
         # 172.23.161.197:
         #   ansible_user: fabiossena
         #   ansible_become: true
