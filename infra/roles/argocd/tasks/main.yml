@@ -1,4 +1,9 @@
 ---
+- name: Verificar conexão com cluster Kubernetes
+  command: kubectl cluster-info
+  register: cluster_info
+  failed_when: false
+  
 - name: Criar namespace para ArgoCD
   kubernetes.core.k8s:
     api_version: v1
