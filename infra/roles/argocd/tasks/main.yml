@@ -39,13 +39,13 @@
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
   register: argocd_ns_gone
+  failed_when: false
   until: argocd_ns_gone.rc != 0
   retries: 30
   delay: 5
-  when: argocd_ns_exists.rc == 0
   changed_when: false
 
-  
+
 - name: Create ArgoCD namespace
   shell: kubectl create namespace {{ argocd_namespace }}
   args:
