@@ -1,6 +1,51 @@
 ---
 # ArgoCD installation via Kustomization manifest in K3s auto-apply directory
+- name: Check if ArgoCD namespace exists
+  shell: |
+    /usr/local/bin/k3s kubectl get ns {{ argocd_namespace }} >/dev/null 2>&1
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_ns_exists
+  failed_when: false
+  changed_when: false
 
+- name: Backup existing ArgoCD manifests (if any)
+  shell: |
+    mkdir -p /var/backups/argocd && \
+    cp -f /var/lib/rancher/k3s/server/manifests/argocd*.yaml \
+          /var/backups/argocd/ 2>/dev/null || true
+  when: argocd_ns_exists.rc == 0
+
+- name: Remove ArgoCD auto-applied manifests
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /var/lib/rancher/k3s/server/manifests/argocd.yaml
+    - /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
+  when: argocd_ns_exists.rc == 0
+
+- name: Delete ArgoCD namespace (rollback)
+  shell: |
+    /usr/local/bin/k3s kubectl delete ns {{ argocd_namespace }} --wait=true
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  when: argocd_ns_exists.rc == 0
+  ignore_errors: yes
+
+- name: Wait until ArgoCD namespace is fully removed
+  shell: |
+    /usr/local/bin/k3s kubectl get ns {{ argocd_namespace }}
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_ns_gone
+  until: argocd_ns_gone.rc != 0
+  retries: 30
+  delay: 5
+  when: argocd_ns_exists.rc == 0
+  changed_when: false
+
+  
 - name: Create ArgoCD namespace
   shell: kubectl create namespace {{ argocd_namespace }}
   args:
