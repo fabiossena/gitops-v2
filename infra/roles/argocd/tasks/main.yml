@@ -24,7 +24,7 @@
     - /var/lib/rancher/k3s/server/manifests/argocd.yaml
     - /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
   when: argocd_ns_exists.rc == 0
-  tags: [argocd, rollback]  
+  tags: [argocd_rollback]  
 
 - name: Delete ArgoCD namespace (rollback)
   shell: |
@@ -33,7 +33,7 @@
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
   when: argocd_ns_exists.rc == 0
   ignore_errors: yes
-  tags: [argocd, rollback]  
+  tags: [argocd_rollback]  
 
 - name: Wait until ArgoCD namespace is fully removed
   shell: |
@@ -46,7 +46,7 @@
   retries: 30
   delay: 5
   changed_when: false
-  tags: [argocd, rollback]  
+  tags: [argocd_rollback]  
 
 
 - name: Create ArgoCD namespace
