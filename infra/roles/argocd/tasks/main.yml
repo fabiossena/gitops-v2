@@ -85,9 +85,20 @@
   changed_when: false
   ignore_errors: yes
 
-- name: Wait a few more seconds for secret to be ready
-  pause:
-    seconds: 5
+# - name: Wait a few more seconds for secret to be ready
+#   pause:
+#     seconds: 5
+- name: Wait for ArgoCD admin secret to exist
+  shell: |
+    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_secret_check
+  until: argocd_secret_check.rc == 0
+  retries: 20
+  delay: 5
+  changed_when: false
+  failed_when: false    
 
 - name: Get ArgoCD initial admin password
   shell: |
