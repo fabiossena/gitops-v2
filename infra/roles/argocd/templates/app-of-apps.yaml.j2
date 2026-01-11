@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-production
+  name: app-{{ environment }}
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: {{ gitops_repo_url }}
     targetRevision: HEAD
-    path: environments/production
+    path: overlays/{{ environment }}
   destination:
     server: https://kubernetes.default.svc
-    namespace: production
+    namespace: {{ environment }}
   syncPolicy:
     automated:
       prune: true

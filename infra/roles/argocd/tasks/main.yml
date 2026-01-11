@@ -31,11 +31,31 @@
     namespace: "{{ argocd_namespace }}"
 
 
-- name: Deploy App of Apps
+# - name: Deploy App of Apps
+#   template:
+#     src: app-of-apps.yaml.j2
+#     dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
+- name: Deploy Production
   template:
     src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
-    
+    dest: /var/lib/rancher/k3s/server/manifests/app-production.yaml
+  vars:
+    environment: production
+
+- name: Deploy Staging
+  template:
+    src: app-of-apps.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/app-staging.yaml
+  vars:
+    environment: staging
+
+- name: Deploy qa
+  template:
+    src: app-of-apps.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/app-development.yaml
+  vars:
+    environment: qa
+
 - name: Patch argocd-server to NodePort
   kubernetes.core.k8s:
     state: patched
