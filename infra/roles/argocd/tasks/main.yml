@@ -9,13 +9,13 @@
   become: yes
   copy:
     src: "{{ k3s_kubeconfig }}"
-    dest: "~/.kube/config"
+    dest: "{{ kubeconfig_path }}"
     remote_src: yes
     mode: '0600'
 
 - name: Ajustar kubeconfig para apontar para localhost
   shell: |
-    sed -i 's/server: .*/server: https:\/\/127.0.0.1:6443/' ~/.kube/config
+    sed -i 's/server: .*/server: https:\/\/127.0.0.1:6443/' "{{ kubeconfig_path }}"
   register: kubeconfig_update
 
 - name: Verificar conexão com cluster K3s
