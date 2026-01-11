@@ -24,7 +24,7 @@
   failed_when: false
   ignore_errors: yes
   environment:
-    KUBECONFIG: ~/.kube/config
+    KUBECONFIG: "{{ kubeconfig_path }}"
 
 - name: Verificar se podemos acessar o cluster
   debug:
@@ -35,7 +35,7 @@
   command: |
     kubectl create namespace {{ argocd_namespace }} --dry-run=client -o yaml | kubectl apply -f -
   environment:
-    KUBECONFIG: ~/.kube/config
+    KUBECONFIG: "{{ kubeconfig_path }}"
   register: namespace_result
   changed_when: "'created' in namespace_result.stdout or 'configured' in namespace_result.stdout"
   when: cluster_info.rc == 0
