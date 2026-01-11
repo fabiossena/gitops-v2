@@ -30,6 +30,12 @@
     src: "{{ role_path }}/files/argocd-install.yaml"
     namespace: "{{ argocd_namespace }}"
 
+
+- name: Deploy App of Apps
+  template:
+    src: app-of-apps.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
+    
 - name: Patch argocd-server to NodePort
   kubernetes.core.k8s:
     state: patched
