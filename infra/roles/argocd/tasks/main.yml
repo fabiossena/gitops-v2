@@ -40,21 +40,21 @@
     src: app-of-apps.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-production.yaml
   vars:
-    environment: production
+    overlay: production
 
 - name: Deploy Staging
   template:
     src: app-of-apps.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-staging.yaml
   vars:
-    environment: staging
+    overlay: staging
 
 - name: Deploy qa
   template:
     src: app-of-apps.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-development.yaml
   vars:
-    environment: qa
+    overlay: qa
 
 - name: Patch argocd-server to NodePort
   kubernetes.core.k8s:
