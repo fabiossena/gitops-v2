@@ -1,0 +1,162 @@
+---
+# ArgoCD installation via Kustomization manifest in K3s auto-apply directory
+- name: Check if ArgoCD namespace exists
+  shell: |
+    /usr/local/bin/k3s kubectl get ns {{ argocd_namespace }} >/dev/null 2>&1
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_ns_exists
+  failed_when: false
+  changed_when: false
+
+- name: Backup existing ArgoCD manifests (if any)
+  shell: |
+    mkdir -p /var/backups/argocd && \
+    cp -f /var/lib/rancher/k3s/server/manifests/argocd*.yaml \
+          /var/backups/argocd/ 2>/dev/null || true
+  when: argocd_ns_exists.rc == 0
+
+- name: Remove ArgoCD auto-applied manifests
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /var/lib/rancher/k3s/server/manifests/argocd.yaml
+    - /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
+  when: argocd_ns_exists.rc == 0
+
+- name: Delete ArgoCD namespace (rollback)
+  shell: |
+    /usr/local/bin/k3s kubectl delete ns {{ argocd_namespace }} --wait=true
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  when: argocd_ns_exists.rc == 0
+  ignore_errors: yes
+
+- name: Wait until ArgoCD namespace is fully removed
+  shell: |
+    /usr/local/bin/k3s kubectl get ns {{ argocd_namespace }}
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_ns_gone
+  failed_when: false
+  until: argocd_ns_gone.rc != 0
+  retries: 30
+  delay: 5
+  changed_when: false
+
+
+- name: Create ArgoCD namespace
+  shell: kubectl create namespace {{ argocd_namespace }}
+  args:
+    creates: /var/lib/rancher/k3s/server/manifests/argocd-ns.yaml
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  ignore_errors: yes
+
+- name: Install ArgoCD via Kustomization manifest
+  template:
+    src: argocd-install.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/argocd.yaml
+
+- name: Deploy App of Apps
+  template:
+    src: app-of-apps.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
+
+- name: Wait for ArgoCD namespace to be created
+  shell: |
+    /usr/local/bin/k3s kubectl get ns {{ argocd_namespace }}
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_ns_check
+  until: argocd_ns_check.rc == 0
+  retries: 20
+  delay: 5
+  changed_when: false
+
+- name: Wait for ArgoCD pods to be ready
+  shell: |
+    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} wait --for=condition=available \
+      deployment/argocd-server --timeout=300s
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_deploy_wait
+  changed_when: false
+  ignore_errors: yes
+
+# - name: Wait a few more seconds for secret to be ready
+#   pause:
+#     seconds: 5
+- name: Wait for ArgoCD admin secret to exist
+  shell: |
+    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_secret_check
+  until: argocd_secret_check.rc == 0
+  retries: 20
+  delay: 5
+  changed_when: false
+  failed_when: false    
+
+- name: Get ArgoCD initial admin password
+  shell: |
+    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
+      -o jsonpath="{.data.password}" 2>/dev/null | base64 -d
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_password
+  changed_when: false
+  ignore_errors: yes
+
+- name: Get ArgoCD service port
+  shell: |
+    /usr/local/bin/k3s kubectl -n {{ argocd_namespace }} get svc argocd-server \
+      -o jsonpath='{.spec.ports[?(@.name=="https")].nodePort}' 2>/dev/null || echo "30443"
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: argocd_port
+  changed_when: false
+  ignore_errors: yes
+
+- name: Get node IP
+  shell: |
+    /usr/local/bin/k3s kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null || hostname -I | awk '{print $1}'
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: node_ip
+  changed_when: false
+  ignore_errors: yes
+
+- name: Display ArgoCD access information
+  debug:
+    msg: |
+      ╔══════════════════════════════════════════════════════════╗
+      ║          🎯 ArgoCD Installation Complete! 🎯             ║
+      ╠══════════════════════════════════════════════════════════╣
+      ║ URL:        https://{{ node_ip.stdout | default('UNKNOWN') }}:{{ argocd_port.stdout | default('30443') }}
+      ║ Username:   admin
+      ║ Password:   {{ argocd_password.stdout | default('UNKNOWN') }}
+      ╠══════════════════════════════════════════════════════════╣
+      ║ Namespace:  {{ argocd_namespace }}
+      ║ Version:    {{ argocd_version }}
+      ╚══════════════════════════════════════════════════════════╝
+      
+      To access ArgoCD:
+      1. Open browser: https://{{ node_ip.stdout }}:{{ argocd_port.stdout }}
+      2. Login: admin / {{ argocd_password.stdout }}
+      3. Ignore self-signed certificate warning
+      
+      To retrieve password later:
+      k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+  # Always show best-effort info; values use fallbacks when missing.
+
+- name: Debug ArgoCD registered vars when missing
+  debug:
+    msg: |
+      --- ARGOCD DEBUG ---
+      argocd_password: {{ argocd_password | default('undefined') }}
+      argocd_port: {{ argocd_port | default('undefined') }}
+      node_ip: {{ node_ip | default('undefined') }}
+  when: (argocd_password.stdout | default('') == '') or (argocd_port.stdout | default('') == '') or (node_ip.stdout | default('') == '')

@@ -1,0 +1,81 @@
+- name: Create ArgoCD namespace
+  shell: |
+    kubectl create namespace {{ argocd_namespace }} || true
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+- name: Install ArgoCD manifests
+  template:
+    src: argocd-install.yaml.j2
+    dest: /tmp/argocd-install.yaml
+
+- name: Apply ArgoCD manifests
+  shell: |
+    kubectl apply -n {{ argocd_namespace }} -f /tmp/argocd-install.yaml
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+- name: Wait for ArgoCD server pod to be Ready
+  shell: |
+    kubectl wait \
+      --namespace {{ argocd_namespace }} \
+      --for=condition=Ready pod \
+      -l app.kubernetes.io/name=argocd-server \
+      --timeout=600s
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  changed_when: false
+
+- name: Get ArgoCD initial admin password
+  shell: |
+    kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
+      -o jsonpath="{.data.password}" | base64 -d
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_password
+  changed_when: false
+
+- name: Expose ArgoCD via NodePort
+  shell: |
+    kubectl -n {{ argocd_namespace }} patch svc argocd-server \
+      -p '{"spec": {"type": "NodePort"}}'
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  ignore_errors: true
+
+- name: Get ArgoCD NodePort
+  shell: |
+    kubectl -n {{ argocd_namespace }} get svc argocd-server \
+      -o jsonpath='{.spec.ports[?(@.name=="https")].nodePort}'
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_port
+  changed_when: false
+
+- name: Get node IP
+  shell: |
+    kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: node_ip
+  changed_when: false
+
+- name: Show ArgoCD access info
+  debug:
+    msg: |
+      ✅ ArgoCD instalado com sucesso!
+
+      URL: https://{{ node_ip.stdout | default('UNKNOWN') }}:{{ argocd_port.stdout | default('30443') }}
+      Usuário: admin
+      Senha: {{ argocd_password.stdout | default('UNKNOWN') }}
+
+      (Ignore o aviso de certificado)
+
+- name: Debug registered vars if missing access info
+  debug:
+    msg: |
+      --- ARGOCD DEBUG ---
+      argocd_password: {{ argocd_password | default('undefined') }}
+      argocd_port: {{ argocd_port | default('undefined') }}
+      node_ip: {{ node_ip | default('undefined') }}
+  when: (argocd_password.stdout | default('') == '') or (argocd_port.stdout | default('') == '') or (node_ip.stdout | default('') == '')
