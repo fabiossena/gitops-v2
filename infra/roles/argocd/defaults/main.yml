@@ -4,8 +4,8 @@ gitops_repo_url: https://github.com/fabiossena/gitops-v2.git
 gitops_repo_path: infra/gitops/apps
 
 argocd_nodeport: 30080
-# kubeconfig_path: "{{ lookup('env', 'HOME') }}/.kube/config"
-kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+kubeconfig_path: "{{ lookup('env', 'HOME') }}/.kube/config"
+#kubeconfig_path: /etc/rancher/k3s/k3s.yaml
 
 # roles/argocd/defaults/main.yml
 
