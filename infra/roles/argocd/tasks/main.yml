@@ -1,137 +1,72 @@
-# roles/argocd/tasks/main.yml
----
-- name: Configurar ambiente para K3s
-  set_fact:
-    k3s_kubeconfig: /etc/rancher/k3s/k3s.yaml
-    k3s_api_url: https://127.0.0.1:6443
 
-- name: Copiar kubeconfig do K3s para usuário local
-  become: yes
-  copy:
-    src: "{{ k3s_kubeconfig }}"
-    dest: "{{ kubeconfig_path }}"
-    remote_src: yes
-    mode: '0600'
-
-- name: Ajustar kubeconfig para apontar para localhost
-  shell: |
-    sed -i 's/server: .*/server: https:\/\/127.0.0.1:6443/' "{{ kubeconfig_path }}"
-  register: kubeconfig_update
-
-- name: Verificar conexão com cluster K3s
-  command: kubectl cluster-info
-  register: cluster_info
-  failed_when: false
-  ignore_errors: yes
-  environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
-
-- name: Verificar se podemos acessar o cluster
+- name: Create ArgoCD namespace - teste1
   debug:
-    msg: "Cluster K3s acessível: {{ cluster_info.rc == 0 }}"
-    var: cluster_info.stdout_lines
+    msg: "kubeconfig_path = {{ kubeconfig_path }}"
 
-- name: Criar namespace para ArgoCD usando kubectl
-  command: |
-    kubectl create namespace {{ argocd_namespace }} --dry-run=client -o yaml | kubectl apply -f -
-  environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
-  register: namespace_result
-  changed_when: "'created' in namespace_result.stdout or 'configured' in namespace_result.stdout"
-  when: cluster_info.rc == 0
+- name: Create ArgoCD namespace - teste2
+  shell: "ls {{ kubeconfig_path }}"
+  register: kube_ls
 
-- name: Instalar Helm se necessário
-  block:
-    - name: Verificar se Helm está instalado
-      command: helm version --short
-      register: helm_check
-      failed_when: false
-      changed_when: false
+- name: Show ls result
+  debug:
+    var: kube_ls.stdout
     
-    - name: Instalar Helm
-      shell: |
-        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-      when: helm_check.rc != 0
-      args:
-        creates: /usr/local/bin/helm
-  become: yes
 
-- name: Adicionar repositório Helm do Argo
-  command: helm repo add argo https://argoproj.github.io/argo-helm
-  environment:
-    KUBECONFIG: ~/.kube/config
-  register: helm_repo_add
-  changed_when: helm_repo_add.rc == 0
-  when: cluster_info.rc == 0
+- name: Create ArgoCD namespace - Ensure kubeconfig is available for root
+  shell: |
+    sudo mkdir -p /root/.kube
+    sudo cp {{ kubeconfig_path }} /root/.kube/config
 
-- name: Atualizar repositórios Helm
-  command: helm repo update
-  environment:
-    KUBECONFIG: ~/.kube/config
-  when: cluster_info.rc == 0
+- name: Create ArgoCD namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ argocd_namespace }}"
+    state: present
 
-- name: Instalar ArgoCD com Helm
-  command: |
-    helm upgrade --install argocd argo/argo-cd \
-      --namespace {{ argocd_namespace }} \
-      --version {{ argocd_version }} \
-      --set server.service.type=NodePort \
-      --set server.service.nodePortHttp=30080 \
-      --set server.service.nodePortHttps=30443 \
-      --set server.ingress.enabled=false \
-      --create-namespace \
-      --wait
-  environment:
-    KUBECONFIG: ~/.kube/config
-  register: helm_install
-  changed_when: "'deployed' in helm_install.stdout"
-  when: cluster_info.rc == 0
-  retries: 3
+- name: Install ArgoCD
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ role_path }}/files/argocd-install.yaml"
+    namespace: "{{ argocd_namespace }}"
+
+- name: Patch argocd-server to NodePort
+  kubernetes.core.k8s:
+    state: patched
+    kind: Service
+    name: argocd-server
+    namespace: "{{ argocd_namespace }}"
+    definition:
+      spec:
+        type: NodePort
+        ports:
+          - name: https
+            port: 443
+            targetPort: 8080
+            nodePort: "{{ argocd_nodeport }}"
+
+- name: Wait for ArgoCD server to be ready
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ argocd_namespace }}"
+    label_selectors:
+      - app.kubernetes.io/name=argocd-server
+  register: argocd_pods
+  until: argocd_pods.resources | length > 0 and
+         argocd_pods.resources[0].status.containerStatuses[0].ready
+  retries: 30
   delay: 10
 
-- name: Aguardar pods do ArgoCD
+- name: Get initial admin password
   shell: |
-    timeout 300 bash -c '
-    until kubectl get pods -n {{ argocd_namespace }} -l app.kubernetes.io/name=argocd-server -o jsonpath="{.items[*].status.phase}" | grep -q Running; do
-      echo "Aguardando pods do ArgoCD...";
-      sleep 10;
-    done'
-  environment:
-    KUBECONFIG: ~/.kube/config
-  register: wait_pods
-  changed_when: wait_pods.rc == 0
-  when: cluster_info.rc == 0
-
-- name: Obter senha inicial do ArgoCD
-  command: |
     kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
       -o jsonpath="{.data.password}" | base64 -d
-  environment:
-    KUBECONFIG: ~/.kube/config
-  register: argocd_password
-  failed_when: false
+  register: argocd_admin_password
   changed_when: false
-  when: cluster_info.rc == 0
 
-- name: Configurar port-forward para acesso
-  shell: |
-    kubectl port-forward svc/argocd-server -n {{ argocd_namespace }} 8080:443 &
-    echo $! > /tmp/argocd-port-forward.pid
-    sleep 3
-  environment:
-    KUBECONFIG: ~/.kube/config
-  async: 3600
-  poll: 0
-  when: cluster_info.rc == 0
-
-- name: Exibir informações de acesso
+- name: Show ArgoCD access info
   debug:
     msg:
-      - "🎉 ArgoCD instalado com sucesso no K3s!"
-      - "📁 Namespace: {{ argocd_namespace }}"
-      - "🔑 Senha do admin: {{ argocd_password.stdout if argocd_password.stdout is defined else 'Execute: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath=\"{.data.password}\" | base64 -d' }}"
-      - "🌐 URL local: https://localhost:8080"
-      - "🌐 URL NodePort: http://localhost:30080 (HTTP) ou https://localhost:30443 (HTTPS)"
-      - "👤 Usuário: admin"
-      - ""
-      - "Para parar o port-forward: kill $(cat /tmp/argocd-port-forward.pid)"
+      - "ArgoCD UI: https://<NODE-IP>:{{ argocd_nodeport }}"
+      - "User: admin"
+      - "Password: {{ argocd_admin_password.stdout }}"
