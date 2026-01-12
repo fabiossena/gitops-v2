@@ -1,8 +1,8 @@
 
-# - name: Create ArgoCD namespace - Ensure kubeconfig is available for root
-#   shell: |
-#     sudo mkdir -p /root/.kube
-#     sudo cp {{ kubeconfig_path }} /root/.kube/config
+- name: Create ArgoCD namespace - Ensure kubeconfig is available for root
+  shell: |
+    sudo mkdir -p /root/.kube
+    sudo cp {{ kubeconfig_path }} /root/.kube/config
 
 - name: Create ArgoCD namespace
   kubernetes.core.k8s:
@@ -14,7 +14,7 @@
 - name: Install ArgoCD
   kubernetes.core.k8s:
     state: present
-    src: "{{ role_path }}/files/argocd-helm-install.yaml"
+    src: "{{ role_path }}/files/argocd-install.yaml"
     namespace: "{{ argocd_namespace }}"
 
 
