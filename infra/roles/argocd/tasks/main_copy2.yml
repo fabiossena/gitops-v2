@@ -27,7 +27,7 @@
 - name: Install ArgoCD
   kubernetes.core.k8s:
     state: present
-    src: "{{ role_path }}/files/argocd-install.yaml"
+    src: "{{ role_path }}/files/argocd-helm-install.yaml"
     namespace: "{{ argocd_namespace }}"
 
 - name: Patch argocd-server to NodePort
