@@ -6,7 +6,7 @@
 
 - name: Create ArgoCD namespace
   kubernetes.core.k8s:
-    api_version: v1
+    kubeconfig: "{{ kubeconfig_path }}"
     kind: Namespace
     name: "{{ argocd_namespace }}"
     state: present
