@@ -27,7 +27,7 @@
   loop:
     - /etc/rancher/k3s
     - /var/lib/rancher/k3s
-    - /var/lib/kubelet
+    # - /var/lib/kubelet
     - /etc/systemd/system/k3s.service
     - /etc/systemd/system/k3s.service.env
   ignore_errors: yes
