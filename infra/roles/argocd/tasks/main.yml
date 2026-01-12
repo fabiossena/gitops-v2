@@ -22,6 +22,7 @@
     kind: Namespace
     name: "{{ argocd_namespace }}"
     state: present
+    become: yes
 
 - name: Install ArgoCD
   kubernetes.core.k8s:
