@@ -1,0 +1,19 @@
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+  # annotations:
+  #   kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: fsysolutions.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: main-app
+            port:
+              number: 80
