@@ -22,7 +22,7 @@
     name: "{{ argocd_namespace }}"
     state: present
     validate_certs: no
-  become: yes
+  # become: yes
 
 - name: Install ArgoCD
   kubernetes.core.k8s:
