@@ -1,4 +1,4 @@
 ﻿resources:
-  - namespace.yaml
+  #- namespace.yaml
   - main-app
   - jobs
