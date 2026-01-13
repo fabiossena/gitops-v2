@@ -34,8 +34,8 @@
     state: present
     src: "{{ role_path }}/files/argocd-install.yaml"
     namespace: "{{ argocd_namespace }}"
-    kubeconfig: "{{ kubeconfig_path }}"
-    validate_certs: no
+    kubeconfig: "{{ k8s_common.kubeconfig }}"
+    validate_certs: "{{ k8s_common.validate_certs }}"
 
 # - name: Deploy App of Apps
 #   template:
