@@ -23,8 +23,6 @@
   shell: |
     kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get ns argocd >/dev/null 2>&1 \
     || kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml create ns argocd
-  become: yes
-
 
 # - name: Create ArgoCD namespace - Ensure kubeconfig is available for root
 #   shell: |
@@ -37,7 +35,6 @@
 # Install ArgoCD
 # -------------------------------------------------
 - name: Install ArgoCD manifests
-  become: yes
   shell: |
     kubectl --kubeconfig {{ kubeconfig_path }} \
       apply -n {{ argocd_namespace }} \
@@ -47,7 +44,6 @@
 # Patch Service to NodePort
 # -------------------------------------------------
 - name: Patch argocd-server to NodePort
-  become: yes
   shell: |
     kubectl --kubeconfig {{ kubeconfig_path }} \
       -n {{ argocd_namespace }} \
@@ -71,7 +67,6 @@
 # Wait for ArgoCD Server
 # -------------------------------------------------
 - name: Wait for argocd-server pod to be ready
-  become: yes
   shell: |
     kubectl --kubeconfig {{ kubeconfig_path }} \
       -n {{ argocd_namespace }} \
@@ -83,7 +78,6 @@
 # Get Admin Password
 # -------------------------------------------------
 - name: Get initial ArgoCD admin password
-  become: yes
   shell: |
     kubectl --kubeconfig {{ kubeconfig_path }} \
       -n {{ argocd_namespace }} \
