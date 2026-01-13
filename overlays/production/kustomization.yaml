@@ -4,6 +4,7 @@ namespace: main-namespace-production
 resources:
   - ../../base
   - namespace.yaml
+  - ingress.yaml
 patches:
   - path: main-patch.yaml
 commonLabels:
