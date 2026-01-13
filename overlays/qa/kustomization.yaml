@@ -1,4 +1,4 @@
-﻿namespace: main-namespace-qa
+﻿namespace: main-namespace
 resources:
   - ../../base
 patches:

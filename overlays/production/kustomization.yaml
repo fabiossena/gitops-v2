@@ -1,4 +1,4 @@
-﻿namespace: main-namespace-production
+﻿namespace: main-namespace
 resources:
   - ../../base
 patches:
