@@ -1,6 +1,6 @@
 ﻿apiVersion: v1
 kind: ConfigMap
-metadata:
-  name: main-config
+# metadata:
+#   name: main-config
 data:
   APP_ENV: base
