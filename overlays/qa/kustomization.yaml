@@ -1,5 +1,5 @@
 ﻿namespace: main-namespace-qa
-nameSuffix: -qa
+# nameSuffix: -qa
 resources:
   - namespace.yaml
   - ../../base
