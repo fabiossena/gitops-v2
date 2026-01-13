@@ -22,6 +22,12 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
 
+- name: Install ArgoCD
+  shell: |
+    kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml apply -f {{ role_path }}/files/argocd-install.yaml || true
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
 # - name: Create ArgoCD namespace
 #   kubernetes.core.k8s:
 #     kind: Namespace
@@ -29,13 +35,13 @@
 #     state: present
 #     validate_certs: no
 
-- name: Install ArgoCD
-  kubernetes.core.k8s:
-    state: present
-    src: "{{ role_path }}/files/argocd-install.yaml"
-    namespace: "{{ argocd_namespace }}"
-    kubeconfig: "{{ k8s_common.kubeconfig }}"
-    validate_certs: "{{ k8s_common.validate_certs }}"
+# - name: Install ArgoCD
+#   kubernetes.core.k8s:
+#     state: present
+#     src: "{{ role_path }}/files/argocd-install.yaml"
+#     namespace: "{{ argocd_namespace }}"
+#     kubeconfig: "{{ k8s_common.kubeconfig }}"
+#     validate_certs: "{{ k8s_common.validate_certs }}"
 
 # - name: Deploy App of Apps
 #   template:
