@@ -2,8 +2,11 @@
 namespace: main-namespace-production
 # nameSuffix: -production
 resources:
-  - namespace.yaml
   - ../../base
+  - namespace.yaml
+  - ingress.yaml
+  - external-service.yaml
+  - external-endpoints.yaml
 patches:
   - path: main-patch.yaml
 commonLabels:
