@@ -1,11 +1,10 @@
 ﻿
 namespace: main-namespace-production
-# nameSuffix: -production
 resources:
   - ../../base
   - namespace.yaml
   - ingress.yaml
 patches:
-  - path: main-patch.yaml
+  - path: main-patch.yml
 commonLabels:
   env: production
