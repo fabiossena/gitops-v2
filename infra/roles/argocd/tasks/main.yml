@@ -26,12 +26,12 @@
   become: yes
 
 
-- name: Create ArgoCD namespace - Ensure kubeconfig is available for root
-  shell: |
-    mkdir -p ~/.kube
-    sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-    sudo chown fabiossena:fabiossena ~/.kube/config
-    chmod 600 ~/.kube/config
+# - name: Create ArgoCD namespace - Ensure kubeconfig is available for root
+#   shell: |
+#     mkdir -p ~/.kube
+#     sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+#     sudo chown fabiossena:fabiossena ~/.kube/config
+#     chmod 600 ~/.kube/config
 
 # -------------------------------------------------
 # Install ArgoCD
