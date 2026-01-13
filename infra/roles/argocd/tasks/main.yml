@@ -36,7 +36,8 @@
 - name: Install ArgoCD
   kubernetes.core.k8s:
     state: present
-    src: "{{ role_path }}/files/argocd-helm-install.yaml"
+    #src: "{{ role_path }}/files/argocd-helm-install.yaml"
+    src: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
     namespace: "{{ argocd_namespace }}"
 #     kubeconfig: "{{ k8s_common.kubeconfig }}"
 #     validate_certs: "{{ k8s_common.validate_certs }}"
