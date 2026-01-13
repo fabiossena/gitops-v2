@@ -1,6 +1,8 @@
-﻿namespace: main-namespace
+﻿
+namespace: main-namespace
 nameSuffix: -production
 resources:
+  - namespace.yaml
   - ../../base
 patches:
   - path: main-patch.yaml

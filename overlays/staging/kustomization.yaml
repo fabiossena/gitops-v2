@@ -4,6 +4,7 @@
 namespace: main-namespace
 nameSuffix: -staging
 resources:
+  - namespace.yaml
   - ../../base
 patches:
   - path: main-patch.yaml
