@@ -5,6 +5,6 @@ resources:
   - namespace.yaml
   - ingress.yaml
 patches:
-  - path: main-patch.yml
+  - path: main-patch.yaml
 commonLabels:
   env: production
