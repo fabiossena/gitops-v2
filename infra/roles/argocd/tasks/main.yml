@@ -82,8 +82,9 @@
 #             nodePort: "{{ argocd_nodeport }}"
 
 - name: Patch argocd-server to NodePort
+  become: yes
   shell: |
-    kubectl --kubeconfig {{ kubeconfig_path }} \
+    kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml \
       -n {{ argocd_namespace }} \
       patch svc argocd-server \
       -p '{
