@@ -34,6 +34,7 @@
     state: present
     src: "{{ role_path }}/files/argocd-install.yaml"
     namespace: "{{ argocd_namespace }}"
+    validate_certs: no
 
 
 # - name: Deploy App of Apps
