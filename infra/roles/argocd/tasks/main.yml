@@ -16,12 +16,12 @@
     sudo mkdir -p /root/.kube
     sudo cp {{ kubeconfig_path }} /root/.kube/config
 
-- name: Create ArgoCD namespace
-  kubernetes.core.k8s:
-    kind: Namespace
-    name: "{{ argocd_namespace }}"
-    state: present
-  become: yes
+# - name: Create ArgoCD namespace
+#   kubernetes.core.k8s:
+#     kind: Namespace
+#     name: "{{ argocd_namespace }}"
+#     state: present
+#   become: yes
 
 - name: Install ArgoCD
   kubernetes.core.k8s:
