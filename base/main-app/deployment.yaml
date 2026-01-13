@@ -17,3 +17,6 @@ spec:
           image: php:8.2-apache
           ports:
             - containerPort: 80
+          command: ["/bin/sh", "-c"]
+          args:
+            - echo "Container started at $(date)"; apache2-foreground
