@@ -2,8 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: main-app
-  annotations:
-    kubernetes.io/ingress.class: nginx
 spec:
   rules:
     - host: teste.com.br
