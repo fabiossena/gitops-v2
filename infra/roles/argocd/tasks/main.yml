@@ -20,12 +20,18 @@
 # Namespace
 # -------------------------------------------------
 - name: Ensure ArgoCD namespace exists
-  become: yes
   shell: |
-    kubectl --kubeconfig {{ kubeconfig_path }} \
-      get ns {{ argocd_namespace }} >/dev/null 2>&1 || \
-    kubectl --kubeconfig {{ kubeconfig_path }} \
-      create ns {{ argocd_namespace }}
+    kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get ns argocd >/dev/null 2>&1 \
+    || kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml create ns argocd
+  become: yes
+
+
+# - name: Create ArgoCD namespace - Ensure kubeconfig is available for root
+#   shell: |
+#     mkdir -p ~/.kube
+#     sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+#     sudo chown fabiossena:fabiossena ~/.kube/config
+#     chmod 600 ~/.kube/config
 
 # -------------------------------------------------
 # Install ArgoCD
