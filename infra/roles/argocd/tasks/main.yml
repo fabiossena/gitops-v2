@@ -24,9 +24,7 @@
 
 - name: Install ArgoCD
   shell: |
-    kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml apply -f {{ role_path }}/files/argocd-install.yaml || true
-  environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
+    kubectl --kubeconfig {{ kubeconfig_path }} apply -f {{ role_path }}/files/argocd-install.yaml || true
 
 # - name: Create ArgoCD namespace
 #   kubernetes.core.k8s:
@@ -68,20 +66,37 @@
   vars:
     overlay: qa
 
+# - name: Patch argocd-server to NodePort
+#   kubernetes.core.k8s:
+#     state: patched
+#     kind: Service
+#     name: argocd-server
+#     namespace: "{{ argocd_namespace }}"
+#     definition:
+#       spec:
+#         type: NodePort
+#         ports:
+#           - name: https
+#             port: 443
+#             targetPort: 8080
+#             nodePort: "{{ argocd_nodeport }}"
+
 - name: Patch argocd-server to NodePort
-  kubernetes.core.k8s:
-    state: patched
-    kind: Service
-    name: argocd-server
-    namespace: "{{ argocd_namespace }}"
-    definition:
-      spec:
-        type: NodePort
-        ports:
-          - name: https
-            port: 443
-            targetPort: 8080
-            nodePort: "{{ argocd_nodeport }}"
+  shell: |
+    kubectl --kubeconfig {{ kubeconfig_path }} \
+      -n {{ argocd_namespace }} \
+      patch svc argocd-server \
+      -p '{
+        "spec": {
+          "type": "NodePort",
+          "ports": [{
+            "name": "https",
+            "port": 443,
+            "targetPort": 8080,
+            "nodePort": {{ argocd_nodeport }}
+          }]
+        }
+      }'
 
 - name: Wait for ArgoCD server to be ready
   kubernetes.core.k8s_info:
