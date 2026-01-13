@@ -13,6 +13,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: external-main-app
+                name: main-app
                 port:
                   number: 80
