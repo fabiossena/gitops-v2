@@ -21,12 +21,13 @@
     kind: Namespace
     name: "{{ argocd_namespace }}"
     state: present
+    validate_certs: no
   become: yes
 
 - name: Install ArgoCD
   kubernetes.core.k8s:
     state: present
-    src: "{{ role_path }}/files/argocd-helm-install.yaml"
+    src: "{{ role_path }}/files/argocd-install.yaml"
     namespace: "{{ argocd_namespace }}"
 
 
