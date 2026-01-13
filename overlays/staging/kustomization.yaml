@@ -1,8 +1,8 @@
 ﻿# apiVersion: kustomize.config.k8s.io/v1beta1
 # kind: Kustomization
 
-namespace: main-namespace
-nameSuffix: -staging
+namespace: main-namespace-staging
+# nameSuffix: -staging
 resources:
   - namespace.yaml
   - ../../base

@@ -11,7 +11,7 @@ spec:
     path: overlays/{{ overlay }}
   destination:
     server: https://kubernetes.default.svc
-    namespace: {{ overlay }}
+    namespace: main-namespace-{{ overlay }}
   syncPolicy:
     automated:
       prune: true
