@@ -1,5 +1,8 @@
 ﻿namespace: main-namespace
+nameSuffix: -production
 resources:
   - ../../base
 patches:
   - path: main-patch.yaml
+commonLabels:
+  env: production
