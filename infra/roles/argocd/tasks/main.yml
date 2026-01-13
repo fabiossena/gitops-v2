@@ -1,95 +1,94 @@
+# -------------------------------------------------
+# ArgoCD Bootstrap via kubectl (K3s-safe)
+# -------------------------------------------------
 
-- name: Create ArgoCD namespace - teste1
+- name: Debug kubeconfig path
   debug:
-    msg: "kubeconfig_path = {{ kubeconfig_path }}"
+    msg: "Using kubeconfig: {{ kubeconfig_path }}"
 
-- name: Create ArgoCD namespace - teste2
-  shell: "ls {{ kubeconfig_path }}"
-  register: kube_ls
+- name: Ensure kubeconfig exists
+  stat:
+    path: "{{ kubeconfig_path }}"
+  register: kubeconfig_stat
 
-- name: Show ls result
-  debug:
-    var: kube_ls.stdout
-    
-- name: Create ArgoCD namespace - Ensure kubeconfig is available for root
+- name: Fail if kubeconfig not found
+  fail:
+    msg: "Kubeconfig not found at {{ kubeconfig_path }}"
+  when: not kubeconfig_stat.stat.exists
+
+# -------------------------------------------------
+# Namespace
+# -------------------------------------------------
+- name: Ensure ArgoCD namespace exists
+  become: yes
   shell: |
-    sudo mkdir -p /root/.kube
-    sudo cp {{ kubeconfig_path }} /root/.kube/config
+    kubectl --kubeconfig {{ kubeconfig_path }} \
+      get ns {{ argocd_namespace }} >/dev/null 2>&1 || \
+    kubectl --kubeconfig {{ kubeconfig_path }} \
+      create ns {{ argocd_namespace }}
 
-- name: Create ArgoCD namespace
-  kubernetes.core.k8s:
-    kind: Namespace
-    name: "{{ argocd_namespace }}"
-#     state: present
-#     validate_certs: no
+# -------------------------------------------------
+# Install ArgoCD
+# -------------------------------------------------
+- name: Install ArgoCD manifests
+  become: yes
+  shell: |
+    kubectl --kubeconfig {{ kubeconfig_path }} \
+      apply -n {{ argocd_namespace }} \
+      -f {{ role_path }}/files/argocd-install.yaml
 
-- name: Install ArgoCD
-  kubernetes.core.k8s:
-    state: present
-    src: "{{ role_path }}/files/argocd-install.yaml"
-    namespace: "{{ argocd_namespace }}"
-    kubeconfig: "{{ k8s_common.kubeconfig }}"
-    validate_certs: "{{ k8s_common.validate_certs }}"
-
-# - name: Deploy App of Apps
-#   template:
-#     src: app-of-apps.yaml.j2
-#     dest: /var/lib/rancher/k3s/server/manifests/app-of-apps.yaml
-- name: Deploy Production
-  template:
-    src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-production.yaml
-  vars:
-    overlay: production
-
-- name: Deploy Staging
-  template:
-    src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-staging.yaml
-  vars:
-    overlay: staging
-
-- name: Deploy qa
-  template:
-    src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-development.yaml
-  vars:
-    overlay: qa
-
+# -------------------------------------------------
+# Patch Service to NodePort
+# -------------------------------------------------
 - name: Patch argocd-server to NodePort
-  kubernetes.core.k8s:
-    state: patched
-    kind: Service
-    name: argocd-server
-    namespace: "{{ argocd_namespace }}"
-    definition:
-      spec:
-        type: NodePort
-        ports:
-          - name: https
-            port: 443
-            targetPort: 8080
-            nodePort: "{{ argocd_nodeport }}"
-
-- name: Wait for ArgoCD server to be ready
-  kubernetes.core.k8s_info:
-    kind: Pod
-    namespace: "{{ argocd_namespace }}"
-    label_selectors:
-      - app.kubernetes.io/name=argocd-server
-  register: argocd_pods
-  until: argocd_pods.resources | length > 0 and
-         argocd_pods.resources[0].status.containerStatuses[0].ready
-  retries: 30
-  delay: 10
-
-- name: Get initial admin password
+  become: yes
   shell: |
-    kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
+    kubectl --kubeconfig {{ kubeconfig_path }} \
+      -n {{ argocd_namespace }} \
+      get svc argocd-server >/dev/null 2>&1 && \
+    kubectl --kubeconfig {{ kubeconfig_path }} \
+      -n {{ argocd_namespace }} \
+      patch svc argocd-server \
+      -p '{
+        "spec": {
+          "type": "NodePort",
+          "ports": [{
+            "name": "https",
+            "port": 443,
+            "targetPort": 8080,
+            "nodePort": {{ argocd_nodeport }}
+          }]
+        }
+      }'
+
+# -------------------------------------------------
+# Wait for ArgoCD Server
+# -------------------------------------------------
+- name: Wait for argocd-server pod to be ready
+  become: yes
+  shell: |
+    kubectl --kubeconfig {{ kubeconfig_path }} \
+      -n {{ argocd_namespace }} \
+      wait --for=condition=Ready pod \
+      -l app.kubernetes.io/name=argocd-server \
+      --timeout=300s
+
+# -------------------------------------------------
+# Get Admin Password
+# -------------------------------------------------
+- name: Get initial ArgoCD admin password
+  become: yes
+  shell: |
+    kubectl --kubeconfig {{ kubeconfig_path }} \
+      -n {{ argocd_namespace }} \
+      get secret argocd-initial-admin-secret \
       -o jsonpath="{.data.password}" | base64 -d
   register: argocd_admin_password
   changed_when: false
 
+# -------------------------------------------------
+# Output
+# -------------------------------------------------
 - name: Show ArgoCD access info
   debug:
     msg:
