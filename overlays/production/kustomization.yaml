@@ -1,5 +1,5 @@
 ﻿
-namespace: main-namespace #-production
+namespace: main-namespace-production
 nameSuffix: -production
 resources:
   - namespace.yaml

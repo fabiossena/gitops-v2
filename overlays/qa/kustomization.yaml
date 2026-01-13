@@ -1,4 +1,4 @@
-﻿namespace: main-namespace #-qa
+﻿namespace: main-namespace-qa
 nameSuffix: -qa
 resources:
   - namespace.yaml
