@@ -7,6 +7,6 @@ spec:
     app: main-app
   ports:
     - port: 80
-      nodePort: 30081
-      targetPort: 8081
+      # nodePort: 30081
+      # targetPort: 8081
       # nodePort: 30081
