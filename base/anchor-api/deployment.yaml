@@ -23,7 +23,7 @@ spec:
       #       touch /var/www/html/database/database.sqlite
       #   volumeMounts:
       #     - name: database-storage
-      #       mountPath: /var/www/html/database
+      #       mountPath: /var/www/html/database 
 
       containers:
       - name: anchor-api
