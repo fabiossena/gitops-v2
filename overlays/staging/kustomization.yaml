@@ -1,7 +1,6 @@
-# kind: Kustomization
-
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
 namespace: main-namespace-staging
-# nameSuffix: -staging
 resources:
 - namespace.yaml
 - ../../base
@@ -14,5 +13,4 @@ images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
   newTag: b6d0fddbc07b0eb28fd6b7b5c5a0e8068c9b9426
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
+

@@ -49,21 +49,28 @@
 - name: Deploy Production
   template:
     src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-production.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/production-main-app.yaml
   vars:
     overlay: production
 
 - name: Deploy Staging
   template:
     src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-staging.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/staging-main-app.yaml
   vars:
     overlay: staging
 
 - name: Deploy qa
   template:
     src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-development.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/qa-main-app.yaml
+  vars:
+    overlay: qa
+
+- name: Deploy qa
+  template:
+    src: app-of-observability.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/app-observability-qa.yaml
   vars:
     overlay: qa
 
