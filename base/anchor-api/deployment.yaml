@@ -32,16 +32,21 @@ spec:
         ports:
           - containerPort: 80
 
-        envFrom:
-          - configMapRef:
-              name: anchor-api-config
-          - secretRef:
-              name: anchor-api-secrets
+        # envFrom:
+        #   - configMapRef:
+        #       name: anchor-api-config
+        #   - secretRef:
+        #       name: anchor-api-secrets
         volumeMounts:
           - name: database-storage
             mountPath: /var/www/html/database
+          - name: anchor-api-config
+            mountPath: /var/www/html/.env
 
       volumes:
         - name: database-storage
           persistentVolumeClaim:
             claimName: anchor-api-pvc
+        - name: anchor-api-config
+          configMap:
+            name: anchor-api-config
