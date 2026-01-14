@@ -15,7 +15,12 @@ spec:
       initContainers:
       - name: init-sqlite
         image: busybox
-        command: ["sh","-c","mkdir -p /var/www/html/database && touch /var/www/html/database/database.sqlite"]
+        command:
+          - sh
+          - -c
+          - |
+            mkdir -p /var/www/html/database && \
+            touch /var/www/html/database/database.sqlite
         volumeMounts:
           - name: database-storage
             mountPath: /var/www/html/database
