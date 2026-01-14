@@ -3,6 +3,8 @@
 resources:
   - namespace.yaml
   - ../../base
+  - ingress.yaml
+  
 patches:
   - path: main-patch.yaml
 commonLabels:

@@ -9,7 +9,7 @@ kubeconfig_path: "{{ lookup('env', 'HOME') }}/.kube/config"
 
 # roles/argocd/defaults/main.yml
 
-# Configurações específicas para K3s
+# Configurações específicas pcd gitopsara K3s
 argocd_namespace: argocd
 argocd_version: "6.9.3"  # Versão estável mais recente
 
