@@ -15,4 +15,4 @@ commonLabels:
 images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
-  newTag: fd554f2d7899862edfa46619f2539663a9782258
+  newTag: 9bf39b2825d6f989dd3ff26ea15e59873d018b3a
