@@ -2,7 +2,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-dashboards
-  # namespace: observability
+  namespace: main-namespace-production
+  labels:
+    grafana_dashboard: "1"   # O Grafana usa essa label para reconhecer dashboards
 data:
   dashboard-mariadb.json: |
     {

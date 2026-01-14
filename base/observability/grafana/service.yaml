@@ -10,4 +10,4 @@ spec:
   ports:
     - port: 3000        # porta interna do cluster
       targetPort: 3000  # porta do container
-      nodePort: 32000   # porta externa (a que você acessa no navegador)
+      nodePort: 32000   # porta externa para navegador

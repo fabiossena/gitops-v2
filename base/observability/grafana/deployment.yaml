@@ -19,10 +19,18 @@ spec:
           ports:
             - containerPort: 3000
           volumeMounts:
+            # Dashboards JSON
             - name: dashboards
               mountPath: /var/lib/grafana/dashboards
+              readOnly: true
+            # Datasources (Prometheus)
             - name: datasources
               mountPath: /etc/grafana/provisioning/datasources
+              readOnly: true
+            # Dashboard provisioning
+            - name: dashboard-providers
+              mountPath: /etc/grafana/provisioning/dashboards
+              readOnly: true
       volumes:
         - name: dashboards
           configMap:
@@ -30,3 +38,6 @@ spec:
         - name: datasources
           configMap:
             name: grafana-datasources
+        - name: dashboard-providers
+          configMap:
+            name: grafana-dashboard-provider
