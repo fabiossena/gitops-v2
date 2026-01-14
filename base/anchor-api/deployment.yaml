@@ -12,27 +12,23 @@ spec:
       labels:
         app: anchor-api
     spec:
-      initContainers:
-      - name: init-sqlite
-        image: busybox
-        command:
-          - sh
-          - -c
-          - |
-            mkdir -p /var/www/html/database && \
-            touch /var/www/html/database/database.sqlite
-        volumeMounts:
-          - name: database-storage
-            mountPath: /var/www/html/database
-
-      - name: migrate
-        image: ghcr.io/fabiossena/anchor-api:latest
-        command: ["php","artisan","migrate","--force"]
+      # initContainers:
+      # - name: init-sqlite
+      #   image: busybox
+      #   command:
+      #     - sh
+      #     - -c
+      #     - |
+      #       mkdir -p /var/www/html/database && \
+      #       touch /var/www/html/database/database.sqlite
+      #   volumeMounts:
+      #     - name: database-storage
+      #       mountPath: /var/www/html/database
 
       containers:
       - name: anchor-api
-        image: ghcr.io/fabiossena/anchor-api:latest
-        imagePullPolicy: Always
+        image: ghcr.io/fabiossena/anchor-api:v1.0.0
+        imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 80
 
@@ -41,7 +37,6 @@ spec:
               name: anchor-api-config
           - secretRef:
               name: anchor-api-secrets
-
         volumeMounts:
           - name: database-storage
             mountPath: /var/www/html/database
