@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: main-ingress
   labels:
-    app: anchor-app
+    app: anchor-api
 spec:
   rules:
   - host: app.fsysolutions.com
