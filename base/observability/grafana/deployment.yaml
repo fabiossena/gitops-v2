@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  # namespace: observability
+  namespace: main-namespace-production
 spec:
   replicas: 1
   selector:
@@ -15,14 +15,18 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: grafana/grafana:10.4.1
+          image: grafana/grafana:9.5.2
           ports:
             - containerPort: 3000
           volumeMounts:
             - name: dashboards
               mountPath: /var/lib/grafana/dashboards
-              readOnly: true
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
       volumes:
         - name: dashboards
           configMap:
             name: grafana-dashboards
+        - name: datasources
+          configMap:
+            name: grafana-datasources

@@ -1,4 +1,5 @@
 ﻿resources:
-  - configmap-dashboards.yaml
   - deployment.yaml
   - service.yaml
+  - configmap-dashboards.yaml
+  - configmap-datasources.yaml
