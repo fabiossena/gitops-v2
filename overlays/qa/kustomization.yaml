@@ -10,7 +10,7 @@ commonLabels:
 images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
-  newTag: 5ce58f3709b82321aebed3cfc955d3b6d877c705
+  newTag: 13ab25531942b562478a8e31f1ea39a182cfd4c5
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: main-namespace-qa
