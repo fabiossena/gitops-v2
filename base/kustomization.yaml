@@ -1,4 +1,5 @@
 ﻿resources:
   #- namespace.yaml
   - main-app
+  - anchor-api
   - jobs

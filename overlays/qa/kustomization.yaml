@@ -7,3 +7,8 @@ patches:
   - path: main-patch.yaml
 commonLabels:
   env: qa
+
+images:
+- name: ghcr.io/fabiossena/anchor-api
+  newName: ghcr.io/fabiossena/anchor-api
+  newTag: v1
