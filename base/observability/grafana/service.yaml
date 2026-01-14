@@ -2,11 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana
-  # namespace: observability
+  namespace: main-namespace-production
 spec:
-  type: ClusterIP
-  ports:
-    - port: 3000
-      targetPort: 3000
+  type: NodePort
   selector:
     app: grafana
+  ports:
+    - port: 3000        # porta interna do cluster
+      targetPort: 3000  # porta do container
+      nodePort: 32000   # porta externa (a que você acessa no navegador)
