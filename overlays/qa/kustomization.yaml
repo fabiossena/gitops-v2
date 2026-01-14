@@ -1,4 +1,7 @@
-# nameSuffix: -qa
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: main-namespace-qa
+
 resources:
   - namespace.yaml
   - ../../base
@@ -13,6 +16,4 @@ images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
   newTag: 13ab25531942b562478a8e31f1ea39a182cfd4c5
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: main-namespace-qa
+
