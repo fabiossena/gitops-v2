@@ -31,18 +31,13 @@ spec:
         imagePullPolicy: Always
         ports:
           - containerPort: 80
-        env:
-          - name: APP_ENV
-            value: production
-          - name: APP_KEY
-            valueFrom:
-              secretKeyRef:
-                name: anchor-api-secrets
-                key: app_key
-          - name: DB_CONNECTION
-            value: sqlite
-          - name: DB_DATABASE
-            value: /var/www/html/database/database.sqlite
+
+        envFrom:
+          - configMapRef:
+              name: anchor-api-config
+          - secretRef:
+              name: anchor-api-secrets
+
         volumeMounts:
           - name: database-storage
             mountPath: /var/www/html/database
