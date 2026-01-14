@@ -4,6 +4,7 @@ metadata:
   name: main-ingress-qa
   labels:
     app: anchor-api
+namespace: main-namespace-qa
 spec:
   rules:
   - host: app.fsysolutions.com
