@@ -12,27 +12,41 @@ spec:
       labels:
         app: anchor-api
     spec:
+      initContainers:
+      - name: init-sqlite
+        image: busybox
+        command:
+          - sh
+          - -c
+          - |
+            mkdir -p /var/www/html/database && \
+            touch /var/www/html/database/database.sqlite
+        volumeMounts:
+          - name: database-storage
+            mountPath: /var/www/html/database
+
       containers:
-        - name: anchor-api
-          image: ghcr.io/fabiossena/anchor-api:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 80
-          env:
-            - name: APP_ENV
-              value: "production"
-            - name: APP_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: anchor-api-secrets
-                  key: app_key
-            - name: DB_CONNECTION
-              value: sqlite
-            - name: DB_DATABASE
-              value: /var/www/html/database/database.sqlite
-          volumeMounts:
-            - name: database-storage
-              mountPath: /var/www/html/database
+      - name: anchor-api
+        image: ghcr.io/fabiossena/anchor-api:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+        env:
+          - name: APP_ENV
+            value: production
+          - name: APP_KEY
+            valueFrom:
+              secretKeyRef:
+                name: anchor-api-secrets
+                key: app_key
+          - name: DB_CONNECTION
+            value: sqlite
+          - name: DB_DATABASE
+            value: /var/www/html/database/database.sqlite
+        volumeMounts:
+          - name: database-storage
+            mountPath: /var/www/html/database
+
       volumes:
         - name: database-storage
           persistentVolumeClaim:

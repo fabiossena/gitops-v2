@@ -2,10 +2,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: main-ingress-qa
+  namespace: main-namespace-qa
   labels:
     app: anchor-api
-namespace: main-namespace-qa
 spec:
+  ingressClassName: traefik
   rules:
   - host: app.fsysolutions.com
     http:
