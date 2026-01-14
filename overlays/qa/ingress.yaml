@@ -13,6 +13,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: main-app
+            name: anchor-api
             port:
               number: 80
