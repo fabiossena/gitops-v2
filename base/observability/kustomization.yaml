@@ -1,0 +1,13 @@
+﻿apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: observability
+
+resources:
+  - namespace.yaml
+  - node-exporter
+  - prometheus
+  - grafana
+
+commonLabels:
+  app.kubernetes.io/part-of: observability
