@@ -67,7 +67,7 @@
   vars:
     overlay: qa
 
-- name: Deploy qa
+- name: Deploy obsevabily qa
   template:
     src: app-of-observability.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-observability-qa.yaml
