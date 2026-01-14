@@ -1,18 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observability-{{ overlay }} 
+  name: app-observability-{{ overlay }} 
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: {{ gitops_repo_url }}
     targetRevision: main
-    path: monitoring/overlays/{{ overlay }}   # atenção: spelling {{ overlay }}
+    path: overlays/{{ overlay }}/observability
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: main-namespace-{{ overlay }}
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
+      selfHeal: true      

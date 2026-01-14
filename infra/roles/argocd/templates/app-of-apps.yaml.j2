@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-{{ overlay }}
+  name: main-app-{{ overlay }}
   namespace: argocd
 spec:
   project: default
@@ -18,4 +18,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      
+
