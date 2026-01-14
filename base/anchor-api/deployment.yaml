@@ -15,15 +15,14 @@ spec:
       initContainers:
       - name: init-sqlite
         image: busybox
-        command:
-          - sh
-          - -c
-          - |
-            mkdir -p /var/www/html/database && \
-            touch /var/www/html/database/database.sqlite
+        command: ["sh","-c","mkdir -p /var/www/html/database && touch /var/www/html/database/database.sqlite"]
         volumeMounts:
           - name: database-storage
             mountPath: /var/www/html/database
+
+      - name: migrate
+        image: ghcr.io/fabiossena/anchor-api:latest
+        command: ["php","artisan","migrate","--force"]
 
       containers:
       - name: anchor-api
