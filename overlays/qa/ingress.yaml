@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: main-ingress-qa
+  name: main-ingress
   labels:
     app: main-app
 spec:
