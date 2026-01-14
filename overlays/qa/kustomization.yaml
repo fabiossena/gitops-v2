@@ -1,4 +1,3 @@
-﻿namespace: main-namespace-qa
 # nameSuffix: -qa
 resources:
   - namespace.yaml
@@ -6,11 +5,14 @@ resources:
   - ingress.yaml
   
 patches:
-  - path: main-patch.yaml
+- path: main-patch.yaml
 commonLabels:
   env: qa
 
 images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
-  newTag: v1
+  newTag: 13ab25531942b562478a8e31f1ea39a182cfd4c5
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: main-namespace-qa
