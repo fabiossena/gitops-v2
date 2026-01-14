@@ -3,9 +3,9 @@ kind: Kustomization
 namespace: main-namespace-qa
 
 resources:
-  - namespace.yaml
-  - ../../base
-  - ingress.yaml
+- namespace.yaml
+- ../../base
+- ingress.yaml
   
 patches:
 - path: main-patch.yaml
@@ -15,5 +15,4 @@ commonLabels:
 images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
-  newTag: 13ab25531942b562478a8e31f1ea39a182cfd4c5
-
+  newTag: 42250f0ab8b598ad1581c4bad60c9c6f0b55a420
