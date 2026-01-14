@@ -7,6 +7,6 @@ spec:
   type: ClusterIP
   ports:
     - port: 3000
-      nodePort: 32000   # porta externa
+      nodePort: 33000   # porta externa
   selector:
     app: grafana
