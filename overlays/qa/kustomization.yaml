@@ -1,14 +1,16 @@
-﻿namespace: main-namespace-qa
 # nameSuffix: -qa
 resources:
-  - namespace.yaml
-  - ../../base
+- namespace.yaml
+- ../../base
 patches:
-  - path: main-patch.yaml
+- path: main-patch.yaml
 commonLabels:
   env: qa
 
 images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
-  newTag: v1
+  newTag: 5ce58f3709b82321aebed3cfc955d3b6d877c705
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: main-namespace-qa
