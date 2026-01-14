@@ -1,0 +1,6 @@
+﻿  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: anchor-api-config
+  data:
+    APP_ENV: base
