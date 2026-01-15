@@ -70,7 +70,7 @@
 
 - name: Deploy of main obsevabily
   template:
-    src: app-of-apps-main-observability.yaml.j2
+    src: app-of-main-observability.yaml.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-observability-main.yaml
   vars:
     overlay: qa
