@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-ids
+  labels:
+    app.kubernetes.io/name: grafana
+data:
+  dashboard-ids.json: |
+    [
+      {
+        "id": 16098,
+        "name": "dashboard-kubernetes-global.json",
+        "title": "Kubernetes / Views / Global"
+      },
+      {
+        "id": 15141,
+        "name": "dashboard-kubernetes-node.json",
+        "title": "Kubernetes / Compute Resources / Node"
+      },
+      {
+        "id": 7362,
+        "name": "dashboard-mysql.json",
+        "title": "MySQL Overview"
+      },
+      {
+        "id": 9628,
+        "name": "dashboard-postgresql.json",
+        "title": "PostgreSQL Database"
+      }
+    ]
