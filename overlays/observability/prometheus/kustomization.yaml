@@ -23,6 +23,6 @@ configMapGenerator:
       - prometheus.yml
       - targets/kubernetes-targets.yaml
       - targets/custom-targets.yaml
-      - exporters/mysql-exporter.yaml
-      - exporters/postgres-exporter.yaml
-      - exporters/kafka-exporter.yaml
+      # - exporters/mysql-exporter.yaml
+      # - exporters/postgres-exporter.yaml
+      # - exporters/kafka-exporter.yaml
