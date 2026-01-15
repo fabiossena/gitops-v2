@@ -38,7 +38,7 @@ spec:
           mountPath: /etc/grafana/provisioning/dashboards
           readOnly: true
         - name: dashboards
-          mountPath: /var/lib/grafana/dashboards
+          mountPath: /etc/grafana/provisioning/dashboards/default
           readOnly: true
         - name: storage
           mountPath: /var/lib/grafana
