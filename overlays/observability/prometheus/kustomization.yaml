@@ -1,3 +1,24 @@
+# apiVersion: kustomize.config.k8s.io/v1beta1
+# kind: Kustomization
+
+# namespace: observability
+
+# commonLabels:
+#   app.kubernetes.io/name: prometheus
+#   app.kubernetes.io/component: monitoring
+
+# resources:
+#   - serviceaccount.yaml
+#   - clusterrole.yaml
+#   - clusterrolebinding.yaml
+#   - configmap.yaml        # Para regras
+#   - config-prometheus.yml # Para configuração
+#   - deployment.yaml
+#   - service.yaml
+
+# # REMOVA completamente configMapGenerator inicialmente
+
+
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
@@ -5,24 +26,16 @@ namespace: observability
 
 commonLabels:
   app.kubernetes.io/name: prometheus
-  app.kubernetes.io/component: monitoring
 
 resources:
   - serviceaccount.yaml
   - clusterrole.yaml
   - clusterrolebinding.yaml
-  - configmap.yaml
   - deployment.yaml
   - service.yaml
 
-# Juntar todos os configMaps em um só
+# ConfigMap básico sem generators
 configMapGenerator:
   - name: prometheus-config
-    behavior: merge
     files:
       - prometheus.yml
-      - targets/kubernetes-targets.yaml
-      - targets/custom-targets.yaml
-      # - exporters/mysql-exporter.yaml
-      # - exporters/postgres-exporter.yaml
-      # - exporters/kafka-exporter.yaml
