@@ -13,3 +13,4 @@ resources:
   - secret-admin.yaml
   - deployment.yaml
   - service.yaml
+  - ingress.yaml
