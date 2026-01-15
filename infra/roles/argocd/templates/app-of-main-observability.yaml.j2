@@ -3,24 +3,12 @@ kind: Application
 metadata:
   name: observability
   namespace: argocd
-  labels:
-    app.kubernetes.io/name: observability
-    app.kubernetes.io/instance: observability-main
-    app.kubernetes.io/part-of: infrastructure
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: {{ gitops_repo_url }}
     targetRevision: main
     path: overlays/observability
-    directory:
-      recurse: true
-    plugin:
-      name: kustomize
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: observability
@@ -28,24 +16,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
-      allowEmpty: false
-    retry:
-      limit: 3
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
     syncOptions:
     - CreateNamespace=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
-    - ApplyOutOfSyncOnly=true
-  ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      jsonPointers:
-        - /spec/replicas
-    - group: ""
-      kind: Service
-      jsonPointers:
-        - /spec/clusterIP
