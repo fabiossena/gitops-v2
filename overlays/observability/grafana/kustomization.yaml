@@ -14,9 +14,10 @@ resources:
   - service.yaml
   - ingress.yaml
 
-# Gerar ConfigMap de dashboards a partir dos arquivos JSON
+# Gerar ConfigMap de dashboards a partir dos arquivos JSON limpos
 configMapGenerator:
   - name: grafana-dashboards
+    #disableNameSuffixHash: true
     files:
       - dashboard-kubernetes-global.json
       - dashboard-kubernetes-node.json
