@@ -5,7 +5,7 @@ namespace: observability
 
 commonLabels:
   app.kubernetes.io/part-of: observability
-  app.kubernetes.io/managed-by: argocd
+  # app.kubernetes.io/managed-by: argocd
 
 resources:
   - namespace.yaml
@@ -14,17 +14,17 @@ resources:
   - prometheus
   - grafana
 
-# Configurações comuns
-configMapGenerator:
-  - name: observability-common-config
-    literals:
-      - cluster_name=production
-      - environment=production
-      - alertmanager_enabled=false
+# # Configurações comuns
+# configMapGenerator:
+#   - name: observability-common-config
+#     literals:
+#       - cluster_name=production
+#       - environment=production
+#       - alertmanager_enabled=false
 
-# Secret para Grafana (senha admin)
-secretGenerator:
-  - name: grafana-admin
-    literals:
-      - password=admin123
-    type: Opaque
+# # Secret para Grafana (senha admin)
+# secretGenerator:
+#   - name: grafana-admin
+#     literals:
+#       - password=admin123
+#     type: Opaque

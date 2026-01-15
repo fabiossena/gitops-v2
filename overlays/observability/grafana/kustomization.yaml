@@ -4,19 +4,15 @@ kind: Kustomization
 namespace: observability
 
 commonLabels:
-  app.kubernetes.io/name: grafana
-  app.kubernetes.io/component: visualization
+  app.kubernetes.io/name: prometheus
 
 resources:
+  - serviceaccount.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - configmap-rules.yaml    # Para regras de alerta
+  - configmap-config.yaml   # Para configuração principal
   - deployment.yaml
   - service.yaml
-  - configmap-datasources.yaml
-  - configmap-dashboard-provider.yaml
-  - configmap-dashboards.yaml
 
-secretGenerator:
-  - name: grafana-admin
-    behavior: merge
-    literals:
-      - password=admin123
-    type: Opaque
+# SEM configMapGenerator inicialmente
