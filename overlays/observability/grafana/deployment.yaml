@@ -27,7 +27,14 @@ spec:
           
           echo "Downloading dashboards from Grafana.com..."
           
+          # Verificar se o arquivo de IDs existe
+          if [ ! -f "$IDS_CONFIG" ]; then
+            echo "Warning: dashboard-ids.json not found, skipping dashboard download"
+            exit 0
+          fi
+          
           # Ler lista de IDs e baixar cada dashboard
+          failed=0
           jq -c '.[]' "$IDS_CONFIG" | while read -r dashboard; do
             id=$(echo "$dashboard" | jq -r '.id')
             name=$(echo "$dashboard" | jq -r '.name')
@@ -35,17 +42,27 @@ spec:
             
             echo "Downloading dashboard ID $id: $title..."
             
-            # Baixar o dashboard do Grafana.com API
-            curl -sSL "https://grafana.com/api/dashboards/$id/revisions/1/download" \
-              -o "$DASHBOARDS_DIR/$name"
-            
-            if [ $? -eq 0 ]; then
-              echo "✓ Successfully downloaded $name"
-            else
-              echo "✗ Failed to download $name"
-              exit 1
-            fi
+            # Baixar o dashboard do Grafana.com API com retry
+            for i in 1 2 3; do
+              if curl -sSL "https://grafana.com/api/dashboards/$id/revisions/1/download" \
+                -o "$DASHBOARDS_DIR/$name"; then
+                echo "✓ Successfully downloaded $name"
+                break
+              else
+                if [ $i -eq 3 ]; then
+                  echo "✗ Failed to download $name after 3 attempts, continuing..."
+                  failed=$((failed + 1))
+                else
+                  echo "Retry $i/3 for $name..."
+                  sleep 2
+                fi
+              fi
+            done
           done
+          
+          if [ $failed -gt 0 ]; then
+            echo "Warning: $failed dashboard(s) failed to download, but continuing..."
+          fi
           
           echo "All dashboards downloaded successfully!"
         volumeMounts:
