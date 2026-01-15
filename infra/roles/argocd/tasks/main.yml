@@ -49,30 +49,40 @@
 - name: Deploy Production
   template:
     src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/production-main-app.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/production-app.yaml
   vars:
     overlay: production
 
 - name: Deploy Staging
   template:
     src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/staging-main-app.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/staging-app.yaml
   vars:
     overlay: staging
 
 - name: Deploy qa
   template:
     src: app-of-apps.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/qa-main-app.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/qa-app.yaml
   vars:
     overlay: qa
 
-- name: Deploy obsevabily qa
+
+- name: Deploy of main obsevabily
   template:
-    src: app-of-observability.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-observability-qa.yaml
+    src: app-of-apps-main-observability.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/app-observability-main.yaml
   vars:
     overlay: qa
+
+# - name: Deploy obsevabily qa
+#   template:
+#     src: app-of-apps-observability.yaml.j2
+#     dest: /var/lib/rancher/k3s/server/manifests/app-observability-qa.yaml
+#   vars:
+#     overlay: qa
+
+
 
 # - name: Patch argocd-server to NodePort
 #   kubernetes.core.k8s:

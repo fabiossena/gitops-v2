@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  namespace: main-namespace-production
+  namespace: production-namespace
 spec:
   replicas: 1
   selector:

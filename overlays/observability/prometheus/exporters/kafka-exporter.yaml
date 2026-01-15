@@ -1,0 +1,11 @@
+# Kafka Exporter job
+- job_name: 'kafka-exporter'
+  kubernetes_sd_configs:
+  - role: endpoints
+  relabel_configs:
+  - source_labels: [__meta_kubernetes_service_name]
+    action: keep
+    regex: kafka-exporter
+  - source_labels: [__meta_kubernetes_endpoint_port_name]
+    action: keep
+    regex: metrics

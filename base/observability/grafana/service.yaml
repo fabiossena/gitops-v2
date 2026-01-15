@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana
-  namespace: main-namespace-production
+  namespace: production-namespace
 spec:
   type: NodePort
   selector:

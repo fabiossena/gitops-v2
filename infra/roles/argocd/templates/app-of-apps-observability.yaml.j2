@@ -11,7 +11,7 @@ spec:
     path: overlays/{{ overlay }}/observability
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: main-namespace-{{ overlay }}
+    namespace: {{ overlay }}-namespace
   syncPolicy:
     automated:
       prune: true

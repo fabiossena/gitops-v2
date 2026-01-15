@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-dashboards
-  namespace: main-namespace-production
+  namespace: production-namespace
   labels:
     grafana_dashboard: "1"   # O Grafana usa essa label para reconhecer dashboards
 data:

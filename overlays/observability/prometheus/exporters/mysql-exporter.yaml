@@ -1,0 +1,13 @@
+# Job para MySQL Exporter (quando deployado)
+- job_name: 'mysql-exporter'
+  kubernetes_sd_configs:
+    - role: endpoints
+  relabel_configs:
+    - source_labels: [__meta_kubernetes_service_name]
+      action: keep
+      regex: .*mysql.*exporter.*
+    - source_labels: [__meta_kubernetes_endpoint_port_name]
+      action: keep
+      regex: metrics
+    - action: labelmap
+      regex: __meta_kubernetes_service_label_(.+)

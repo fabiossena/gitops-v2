@@ -1,0 +1,21 @@
+# Static targets para serviços do observability
+- job_name: 'node-exporter'
+  static_configs:
+    - targets: ['node-exporter.observability.svc.cluster.local:9100']
+      labels:
+        job: 'node-exporter'
+        component: 'infrastructure'
+
+- job_name: 'kube-state-metrics'
+  static_configs:
+    - targets: ['kube-state-metrics.observability.svc.cluster.local:8080']
+      labels:
+        job: 'kube-state-metrics'
+        component: 'kubernetes'
+
+- job_name: 'prometheus'
+  static_configs:
+    - targets: ['prometheus.observability.svc.cluster.local:9090']
+      labels:
+        job: 'prometheus'
+        component: 'monitoring'

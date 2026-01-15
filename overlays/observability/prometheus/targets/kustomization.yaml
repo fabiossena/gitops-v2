@@ -1,0 +1,5 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Este diretório contém apenas definições de targets para o Prometheus
+# Não é aplicável diretamente, é referenciado pelo configMapGenerator

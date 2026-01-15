@@ -2,9 +2,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-dashboard-provider
-  namespace: production-namespace
 data:
-  dashboards.yaml: |
+  provider.yaml: |
     apiVersion: 1
     providers:
       - name: 'default'
@@ -12,5 +11,6 @@ data:
         folder: ''
         type: file
         disableDeletion: false
+        editable: true
         options:
-          path: /var/lib/grafana/dashboards
+          path: /etc/grafana/provisioning/dashboards

@@ -1,4 +1,4 @@
 ﻿apiVersion: v1
 kind: Namespace
 metadata:
-  name: main-namespace-staging
+  name: staging-namespace

@@ -154,3 +154,14 @@ Se estiver logado no host destino:
 Observações
 - Ajuste `infra/inventory/hosts.yaml` antes de executar as playbooks.
 - Verifique permissões/SSH entre a máquina de controle e os nós gerenciados.
+
+
+🔐 ACESSO AO ArgoCD
+kubectl -n argocd get svc
+kubectl -n argocd port-forward svc/argocd-server 8080:443
+
+
+Senha inicial:
+
+kubectl -n argocd get secret argocd-initial-admin-secret \
+-o jsonpath="{.data.password}" | base64 -d
