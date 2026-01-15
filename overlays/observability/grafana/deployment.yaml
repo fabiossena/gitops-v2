@@ -25,13 +25,23 @@ spec:
           DASHBOARDS_DIR="/dashboards"
           IDS_CONFIG="/config/dashboard-ids.json"
           
+          # Criar diretório se não existir
+          mkdir -p "$DASHBOARDS_DIR"
+          
           echo "Downloading dashboards from Grafana.com..."
+          echo "Dashboard directory: $DASHBOARDS_DIR"
+          echo "IDs config file: $IDS_CONFIG"
           
           # Verificar se o arquivo de IDs existe
           if [ ! -f "$IDS_CONFIG" ]; then
-            echo "Warning: dashboard-ids.json not found, skipping dashboard download"
+            echo "ERROR: dashboard-ids.json not found at $IDS_CONFIG"
+            echo "Available files in /config:"
+            ls -la /config/ || echo "Config directory not found"
             exit 0
           fi
+          
+          echo "Found dashboard-ids.json, content:"
+          cat "$IDS_CONFIG"
           
           # Ler lista de IDs e baixar cada dashboard
           failed=0
@@ -72,7 +82,8 @@ spec:
           
           # Listar arquivos baixados para debug
           echo "=== Downloaded dashboards ==="
-          ls -lh "$DASHBOARDS_DIR/" 2>/dev/null || echo "No dashboards directory found"
+          ls -lah "$DASHBOARDS_DIR/" 2>/dev/null || echo "No dashboards directory found"
+          echo "File count: $(ls -1 "$DASHBOARDS_DIR/" 2>/dev/null | wc -l)"
           echo "=============================="
           
           # Verificar se os arquivos são válidos JSON e têm o formato esperado pelo Grafana
