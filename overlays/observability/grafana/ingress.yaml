@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: grafana
+  annotations:
+    # Anotações para Traefik (remova se usar outro Ingress Controller)
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    # Para nginx-ingress, descomente a linha abaixo e remova a do Traefik
+    # nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: traefik  # Altere para 'nginx' ou outro se necessário
+  rules:
+  - host: grafana.local  # Altere para seu domínio (ex: grafana.seudominio.com) ou use "*" para qualquer host
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
