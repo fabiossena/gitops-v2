@@ -31,11 +31,14 @@ spec:
               name: grafana-admin
               key: admin-password
         volumeMounts:
-        - name: config
+        - name: datasources
           mountPath: /etc/grafana/provisioning/datasources
           readOnly: true
-        - name: dashboards
+        - name: dashboard-provider
           mountPath: /etc/grafana/provisioning/dashboards
+          readOnly: true
+        - name: dashboards
+          mountPath: /var/lib/grafana/dashboards
           readOnly: true
         - name: storage
           mountPath: /var/lib/grafana
@@ -47,9 +50,12 @@ spec:
             memory: 256Mi
             cpu: 200m
       volumes:
-      - name: config
+      - name: datasources
         configMap:
           name: grafana-datasources
+      - name: dashboard-provider
+        configMap:
+          name: grafana-dashboard-provider
       - name: dashboards
         configMap:
           name: grafana-dashboards
