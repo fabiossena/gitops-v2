@@ -8,18 +8,9 @@ commonLabels:
 
 resources:
   - configmap-dashboard-provider.yaml
+  - configmap-dashboard-ids.yaml
   - configmap-datasources.yaml
   - secret-admin.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml
-
-# Gerar ConfigMap de dashboards a partir dos arquivos JSON limpos
-configMapGenerator:
-  - name: grafana-dashboards
-    #disableNameSuffixHash: true
-    files:
-      - dashboard-kubernetes-global.json
-      - dashboard-kubernetes-node.json
-      - dashboard-mysql.json
-      - dashboard-postgresql.json
