@@ -35,7 +35,7 @@ spec:
           
           # Ler lista de IDs e baixar cada dashboard
           failed=0
-          jq -c '.[]' "$IDS_CONFIG" | while read -r dashboard; do
+          while IFS= read -r dashboard; do
             id=$(echo "$dashboard" | jq -r '.id')
             name=$(echo "$dashboard" | jq -r '.name')
             title=$(echo "$dashboard" | jq -r '.title')
@@ -46,8 +46,18 @@ spec:
             for i in 1 2 3; do
               if curl -sSL "https://grafana.com/api/dashboards/$id/revisions/1/download" \
                 -o "$DASHBOARDS_DIR/$name"; then
-                echo "✓ Successfully downloaded $name"
-                break
+                # Validar que o arquivo JSON é válido
+                if jq empty "$DASHBOARDS_DIR/$name" 2>/dev/null; then
+                  echo "✓ Successfully downloaded and validated $name"
+                  break
+                else
+                  echo "⚠ Downloaded but invalid JSON: $name, retrying..."
+                  rm -f "$DASHBOARDS_DIR/$name"
+                  if [ $i -eq 3 ]; then
+                    echo "✗ Failed to download valid $name after 3 attempts"
+                    failed=$((failed + 1))
+                  fi
+                fi
               else
                 if [ $i -eq 3 ]; then
                   echo "✗ Failed to download $name after 3 attempts, continuing..."
@@ -58,13 +68,17 @@ spec:
                 fi
               fi
             done
-          done
+          done < <(jq -c '.[]' "$IDS_CONFIG")
+          
+          # Listar arquivos baixados para debug
+          echo "Downloaded dashboards:"
+          ls -lh "$DASHBOARDS_DIR/" || echo "No dashboards directory found"
           
           if [ $failed -gt 0 ]; then
             echo "Warning: $failed dashboard(s) failed to download, but continuing..."
           fi
           
-          echo "All dashboards downloaded successfully!"
+          echo "All dashboards processed!"
         volumeMounts:
         - name: dashboards
           mountPath: /dashboards
