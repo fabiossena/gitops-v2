@@ -41,8 +41,6 @@ spec:
           value: /etc/grafana/provisioning
         - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
           value: /etc/grafana/dashboards/home.json
-        - name: GF_USERS_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
-          value: /etc/grafana/dashboards/home.json
         - name: GF_AUTH_ANONYMOUS_ENABLED
           value: "true"
         - name: GF_AUTH_ANONYMOUS_ORG_ROLE
@@ -50,13 +48,15 @@ spec:
         - name: GF_USERS_ALLOW_SIGN_UP
           value: "false"
         - name: GF_SERVER_ROOT_URL
-          value: "http://localhost:3000/"
+          value: "%(protocol)s://%(domain)s:%(http_port)s/"  # MELHOR para uso com Ingress
         - name: GF_SECURITY_COOKIE_SECURE
-          value: "false"
+          value: "true"  # MUDAR para true se usar HTTPS
         - name: GF_FEATURE_TOGGLES_ENABLE
           value: "publicDashboards,panelTitleSearch,vizAndWidgetSplit"
         - name: GF_DASHBOARDS_MIN_REFRESH_INTERVAL
           value: "5s"
+        - name: GF_INSTALL_PLUGINS  # ADICIONE se precisar de plugins
+          value: "grafana-piechart-panel"
         livenessProbe:
           httpGet:
             path: /api/health
@@ -97,7 +97,7 @@ spec:
       volumes:
       - name: dashboards
         configMap:
-          name: grafana-dashboards
+          name: grafana-dashboards  # Nome deve bater com o ConfigMap
       - name: dashboard-provider
         configMap:
           name: grafana-dashboard-provider
@@ -105,4 +105,4 @@ spec:
         configMap:
           name: grafana-datasources
       - name: grafana-storage
-        emptyDir: {}
+        emptyDir: {}  # CONSIDERE usar PVC para produção
