@@ -67,14 +67,6 @@
   vars:
     overlay: qa
 
-
-- name: Deploy of main obsevabily
-  template:
-    src: app-of-main-observability.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/app-observability-main.yaml
-  vars:
-    overlay: qa
-
 # - name: Deploy obsevabily qa
 #   template:
 #     src: app-of-apps-observability.yaml.j2
@@ -129,6 +121,13 @@
   retries: 30
   delay: 10
 
+
+- name: Deploy of main observability
+  template:
+    src: app-of-main-observability.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/app-observability-main.yaml
+
+    
 - name: Get initial admin password
   shell: |
     kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret \
