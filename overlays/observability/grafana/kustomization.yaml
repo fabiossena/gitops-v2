@@ -21,7 +21,7 @@ configMapGenerator:
   - name: grafana-dashboards
     files:
       - dashboards/node-exporter.json
-      - dashboards/node-exporter-full.json
+      - dashboards/node-exporter-full-clean.json
       - dashboards/kubernetes-node.json
       - dashboards/home.json
     options:
