@@ -1,29 +1,37 @@
 {
   "dashboard": {
-    "id": null,
-    "title": "Home",
-    "tags": [],
-    "style": "dark",
-    "timezone": "browser",
-    "editable": true,
-    "hideControls": false,
-    "sharedCrosshair": false,
-    "panels": [
-      {
-        "id": 1,
-        "title": "Bem-vindo ao Observability Stack",
-        "type": "text",
-        "content": "# Dashboards Disponíveis\n\n- **Node Exporter**: Monitoramento de recursos do sistema\n- **Prometheus**: Métricas do servidor Prometheus\n- **Kubernetes**: Monitoramento do cluster K8s\n\n## Acesso Rápido\n\n- Prometheus: http://prometheus-server.observability:9090\n- Grafana: http://localhost:30000 (NodePort)\n\n## Configuração\n\nTodas as configurações são gerenciadas via GitOps com ArgoCD.",
-        "mode": "markdown",
-        "transparent": true
-      }
-    ],
+    "title": "Home Dashboard",
+    "uid": "home-dashboard",
+    "version": 1,
+    "refresh": "30s",
     "time": {
       "from": "now-6h",
       "to": "now"
     },
-    "refresh": "30s"
+    "timezone": "browser",
+    "panels": [
+      {
+        "type": "text",
+        "title": "Bem-vindo ao Observability Stack",
+        "gridPos": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 2,
+        "mode": "markdown",
+        "content": "# Dashboards Disponíveis\n\n- **Node Exporter**: Monitoramento de recursos do sistema\n- **Prometheus**: Métricas do servidor Prometheus\n- **Kubernetes**: Monitoramento do cluster K8s\n\n## Acesso Rápido\n\n- Prometheus: http://prometheus-server.observability:9090\n- Grafana: http://localhost:30000 (NodePort)\n\n## Configuração\n\nTodas as configurações são gerenciadas via GitOps com ArgoCD."
+      }
+    ],
+    "schemaVersion": 36,
+    "style": "dark",
+    "tags": ["observability", "home"],
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+      "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+    }
   },
-  "folderId": 0,
-  "overwrite": false
+  "overwrite": true,
+  "folderUid": "general"
 }
