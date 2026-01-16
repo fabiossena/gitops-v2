@@ -47,8 +47,8 @@ spec:
           value: "Viewer"
         - name: GF_USERS_ALLOW_SIGN_UP
           value: "false"
-        - name: GF_SERVER_ROOT_URL
-          value: "%(protocol)s://%(domain)s:%(http_port)/"  # MELHOR para uso com Ingress
+        # - name: GF_SERVER_ROOT_URL
+        #   value: "%(protocol)s://%(domain)s:%(http_port)/"  # MELHOR para uso com Ingress
         - name: GF_SECURITY_COOKIE_SECURE
           value: "false" # MUDAR para true se usar HTTPS acima
         - name: GF_FEATURE_TOGGLES_ENABLE
