@@ -3,19 +3,18 @@ kind: ConfigMap
 metadata:
   name: grafana-datasources
   namespace: observability
-  labels:
-    app.kubernetes.io/name: grafana
 data:
   datasources.yaml: |
     apiVersion: 1
     datasources:
       - name: Prometheus
-        uid: prometheus  # Adicione um uid
         type: prometheus
         access: proxy
-        url: http://prometheus-server:9090
+        # Use FQDN completo
+        url: http://prometheus-server.observability.svc.cluster.local:9090
         isDefault: true
         editable: true
         jsonData:
           timeInterval: 5s
+          httpMethod: POST
         version: 1
