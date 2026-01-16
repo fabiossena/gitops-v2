@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: {{ gitops_repo_url }}
     targetRevision: HEAD
-    path: overlays/{{ overlay }}
+    path: application/overlays/{{ overlay }}
   destination:
     server: https://kubernetes.default.svc
     namespace: {{ overlay }}-namespace
