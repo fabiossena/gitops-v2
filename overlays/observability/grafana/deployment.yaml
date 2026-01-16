@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
+  namespace: observability  # Adicione o namespace
   labels:
     app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: observability
 spec:
   replicas: 1
   selector:
@@ -14,9 +16,15 @@ spec:
       labels:
         app.kubernetes.io/name: grafana
     spec:
+      securityContext:
+        fsGroup: 472  # Usuário grafana
+        runAsGroup: 472
+        runAsUser: 472
       initContainers:
       - name: download-dashboards
         image: curlimages/curl:latest
+        securityContext:
+          runAsUser: 0  # Precisa de root para instalar pacotes
         command:
         - /bin/sh
         - -c
@@ -25,92 +33,47 @@ spec:
           DASHBOARDS_DIR="/dashboards"
           IDS_CONFIG="/config/dashboard-ids.json"
           
-          # Criar diretório se não existir
+          # Criar diretório
           mkdir -p "$DASHBOARDS_DIR"
-          
-          echo "Downloading dashboards from Grafana.com..."
-          echo "Dashboard directory: $DASHBOARDS_DIR"
-          echo "IDs config file: $IDS_CONFIG"
           
           # Verificar se o arquivo de IDs existe
           if [ ! -f "$IDS_CONFIG" ]; then
-            echo "ERROR: dashboard-ids.json not found at $IDS_CONFIG"
-            echo "Available files in /config:"
-            ls -la /config/ || echo "Config directory not found"
+            echo "ERROR: dashboard-ids.json not found"
             exit 0
           fi
           
-          echo "Found dashboard-ids.json, content:"
-          cat "$IDS_CONFIG"
-          
-          # Ler lista de IDs e baixar cada dashboard
-          failed=0
-          while IFS= read -r dashboard; do
+          # Baixar dashboards do Grafana.com
+          echo "Downloading dashboards..."
+          jq -c '.[]' "$IDS_CONFIG" | while read -r dashboard; do
             id=$(echo "$dashboard" | jq -r '.id')
             name=$(echo "$dashboard" | jq -r '.name')
-            title=$(echo "$dashboard" | jq -r '.title')
             
-            echo "Downloading dashboard ID $id: $title..."
+            echo "Downloading dashboard $id to $name.json..."
             
-            # Baixar o dashboard do Grafana.com API com retry
-            for i in 1 2 3; do
+            # Baixar com retry
+            for i in {1..3}; do
               if curl -sSL "https://grafana.com/api/dashboards/$id/revisions/1/download" \
-                -o "$DASHBOARDS_DIR/$name"; then
-                # Validar que o arquivo JSON é válido
-                if jq empty "$DASHBOARDS_DIR/$name" 2>/dev/null; then
-                  echo "✓ Successfully downloaded and validated $name"
-                  break
-                else
-                  echo "⚠ Downloaded but invalid JSON: $name, retrying..."
-                  rm -f "$DASHBOARDS_DIR/$name"
-                  if [ $i -eq 3 ]; then
-                    echo "✗ Failed to download valid $name after 3 attempts"
-                    failed=$((failed + 1))
-                  fi
-                fi
+                -o "$DASHBOARDS_DIR/$name.json" && \
+                jq empty "$DASHBOARDS_DIR/$name.json" 2>/dev/null; then
+                echo "✓ Successfully downloaded $name.json"
+                break
               else
+                echo "Attempt $i failed for $name.json"
+                sleep 2
                 if [ $i -eq 3 ]; then
-                  echo "✗ Failed to download $name after 3 attempts, continuing..."
-                  failed=$((failed + 1))
-                else
-                  echo "Retry $i/3 for $name..."
-                  sleep 2
+                  echo "⚠ Could not download $name.json, skipping..."
+                  # Criar um dashboard vazio para evitar erro
+                  echo '{"title": "Placeholder"}' > "$DASHBOARDS_DIR/$name.json"
                 fi
               fi
             done
-          done < <(jq -c '.[]' "$IDS_CONFIG")
-          
-          # Listar arquivos baixados para debug
-          echo "=== Downloaded dashboards ==="
-          ls -lah "$DASHBOARDS_DIR/" 2>/dev/null || echo "No dashboards directory found"
-          echo "File count: $(ls -1 "$DASHBOARDS_DIR/" 2>/dev/null | wc -l)"
-          echo "=============================="
-          
-          # Verificar se os arquivos são válidos JSON e têm o formato esperado pelo Grafana
-          echo "=== Validating dashboard JSONs ==="
-          for json_file in "$DASHBOARDS_DIR"/*.json; do
-            if [ -f "$json_file" ]; then
-              echo "Validating: $(basename "$json_file")"
-              # Verificar se tem "dashboard" ou é um objeto JSON válido
-              if jq empty "$json_file" 2>/dev/null; then
-                # Verificar se tem campo "dashboard" ou é um dashboard direto
-                if jq -e '.dashboard' "$json_file" >/dev/null 2>&1 || jq -e '.uid' "$json_file" >/dev/null 2>&1; then
-                  echo "✓ Valid dashboard JSON: $(basename "$json_file")"
-                else
-                  echo "⚠ JSON válido mas pode não ser um dashboard: $(basename "$json_file")"
-                fi
-              else
-                echo "✗ Invalid JSON: $(basename "$json_file")"
-              fi
-            fi
           done
-          echo "================================="
           
-          if [ $failed -gt 0 ]; then
-            echo "Warning: $failed dashboard(s) failed to download, but continuing..."
-          fi
+          echo "Total dashboards downloaded: $(ls -1 "$DASHBOARDS_DIR" | wc -l)"
           
-          echo "All dashboards processed!"
+          # Ajustar permissões para o usuário grafana (472)
+          chown -R 472:472 "$DASHBOARDS_DIR"
+          chmod -R 755 "$DASHBOARDS_DIR"
         volumeMounts:
         - name: dashboards
           mountPath: /dashboards
@@ -119,8 +82,10 @@ spec:
       containers:
       - name: grafana
         image: grafana/grafana:10.2.0
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
+          name: http
         env:
         - name: GF_SECURITY_ADMIN_USER
           valueFrom:
@@ -135,26 +100,52 @@ spec:
         - name: GF_PATHS_PROVISIONING
           value: /etc/grafana/provisioning
         - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
-          value: /etc/grafana/provisioning/dashboards/default
+          value: /dashboards/default.json  # Ajustado
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "false"
+        - name: GF_USERS_ALLOW_SIGN_UP
+          value: "false"
+        - name: GF_USERS_ALLOW_ORG_CREATE
+          value: "false"
+        - name: GF_SERVER_ROOT_URL
+          value: "%(protocol)s://%(domain)s:30000"  # Ajuste conforme seu ingress
+        - name: GF_SECURITY_COOKIE_SECURE
+          value: "false"  # Se não usar HTTPS
+        - name: GF_SECURITY_ALLOW_EMBEDDING
+          value: "true"
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
         volumeMounts:
         - name: datasources
           mountPath: /etc/grafana/provisioning/datasources
           readOnly: true
+        - name: dashboards
+          mountPath: /dashboards
+          readOnly: true
         - name: dashboard-provider
           mountPath: /etc/grafana/provisioning/dashboards
-          readOnly: true
-        - name: dashboards
-          mountPath: /etc/grafana/provisioning/dashboards/default
           readOnly: true
         - name: storage
           mountPath: /var/lib/grafana
         resources:
-          limits:
-            memory: 512Mi
-            cpu: 500m
           requests:
-            memory: 256Mi
-            cpu: 200m
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
       volumes:
       - name: datasources
         configMap:
