@@ -9,7 +9,8 @@ data:
   datasources.yaml: |
     apiVersion: 1
     datasources:
-      - name: DS_PROMETHEUS  # Use o mesmo nome que o dashboard espera
+      - name: Prometheus
+        uid: prometheus  # Adicione um uid
         type: prometheus
         access: proxy
         url: http://prometheus-server:9090
