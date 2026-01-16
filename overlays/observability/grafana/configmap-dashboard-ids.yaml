@@ -8,23 +8,27 @@ data:
   dashboard-ids.json: |
     [
       {
-        "id": 16098,
-        "name": "dashboard-kubernetes-global.json",
-        "title": "Kubernetes / Views / Global"
+        "id": 8171,
+        "name": "dashboard-kubernetes-main.json",
+        "title": "Kubernetes"
       },
-      {
-        "id": 15141,
-        "name": "dashboard-kubernetes-node.json",
-        "title": "Kubernetes / Compute Resources / Node"
-      },
-      {
-        "id": 7362,
-        "name": "dashboard-mysql.json",
-        "title": "MySQL Overview"
-      },
-      {
-        "id": 9628,
-        "name": "dashboard-postgresql.json",
-        "title": "PostgreSQL Database"
-      }
     ]
+
+
+
+
+# {
+#         "id": 15141,
+#         "name": "dashboard-kubernetes-node.json",
+#         "title": "Kubernetes / Compute Resources / Node"
+#       },
+#       {
+#         "id": 7362,
+#         "name": "dashboard-mysql.json",
+#         "title": "MySQL Overview"
+#       },
+#       {
+#         "id": 9628,
+#         "name": "dashboard-postgresql.json",
+#         "title": "PostgreSQL Database"
+#       }
