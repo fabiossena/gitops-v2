@@ -2,17 +2,27 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
+  namespace: observability
   labels:
+    app: prometheus
+    app.kubernetes.io/component: monitoring
     app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: observability
 spec:
   replicas: 1
   selector:
     matchLabels:
+      app: prometheus
+      app.kubernetes.io/component: monitoring
       app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: observability
   template:
     metadata:
       labels:
+        app: prometheus
+        app.kubernetes.io/component: monitoring
         app.kubernetes.io/name: prometheus
+        app.kubernetes.io/part-of: observability
     spec:
       serviceAccountName: prometheus
       containers:
@@ -24,7 +34,9 @@ spec:
         - --storage.tsdb.retention.time=15d
         - --web.enable-lifecycle
         ports:
-        - containerPort: 9090
+        - name: http
+          containerPort: 9090
+          protocol: TCP
         volumeMounts:
         - name: config
           mountPath: /etc/prometheus
@@ -40,6 +52,18 @@ spec:
           requests:
             memory: 512Mi
             cpu: 500m
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
       volumes:
       - name: config
         configMap:

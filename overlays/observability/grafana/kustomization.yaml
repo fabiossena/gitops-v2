@@ -4,7 +4,10 @@ kind: Kustomization
 namespace: observability
 
 commonLabels:
+  app: grafana  # ADICIONE
   app.kubernetes.io/name: grafana
+  app.kubernetes.io/component: visualization
+  app.kubernetes.io/part-of: observability  # ADICIONE
 
 resources:
   - configmap-dashboard-provider.yaml
@@ -13,5 +16,3 @@ resources:
   - secret-admin.yaml
   - deployment.yaml
   - service.yaml
-  # - configmap-grafana-ini.yaml  # Opcional
-  # - ingress.yaml  # Comente se não for usar

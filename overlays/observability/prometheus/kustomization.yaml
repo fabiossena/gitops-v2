@@ -4,8 +4,10 @@ kind: Kustomization
 namespace: observability
 
 commonLabels:
+  app: prometheus  # ADICIONE
   app.kubernetes.io/name: prometheus
   app.kubernetes.io/component: monitoring
+  app.kubernetes.io/part-of: observability  # ADICIONE
 
 resources:
   - serviceaccount.yaml
