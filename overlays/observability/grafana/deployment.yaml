@@ -5,7 +5,6 @@ metadata:
   namespace: observability
   labels:
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/part-of: observability
 spec:
   replicas: 1
   selector:
@@ -40,38 +39,53 @@ spec:
               key: admin-password
         - name: GF_PATHS_PROVISIONING
           value: /etc/grafana/provisioning
+        - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
+          value: /etc/grafana/dashboards/home.json
+        - name: GF_USERS_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
+          value: /etc/grafana/dashboards/home.json
         - name: GF_AUTH_ANONYMOUS_ENABLED
-          value: "true"  # Permite acesso sem login inicialmente
+          value: "true"
+        - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+          value: "Viewer"
         - name: GF_USERS_ALLOW_SIGN_UP
           value: "false"
         - name: GF_SERVER_ROOT_URL
-          value: "%(protocol)s://%(domain)s:30000/"
+          value: "http://localhost:3000/"
         - name: GF_SECURITY_COOKIE_SECURE
           value: "false"
-        - name: GF_SECURITY_ALLOW_EMBEDDING
-          value: "true"
+        - name: GF_FEATURE_TOGGLES_ENABLE
+          value: "publicDashboards,panelTitleSearch,vizAndWidgetSplit"
+        - name: GF_DASHBOARDS_MIN_REFRESH_INTERVAL
+          value: "5s"
         livenessProbe:
           httpGet:
             path: /api/health
             port: 3000
+            scheme: HTTP
           initialDelaySeconds: 60
           periodSeconds: 30
-          timeoutSeconds: 5
+          timeoutSeconds: 10
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /api/health
             port: 3000
+            scheme: HTTP
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
+          failureThreshold: 3
         volumeMounts:
         - name: dashboards
+          mountPath: /etc/grafana/dashboards
+          readOnly: true
+        - name: dashboard-provider
           mountPath: /etc/grafana/provisioning/dashboards
           readOnly: true
         - name: datasources
           mountPath: /etc/grafana/provisioning/datasources
           readOnly: true
-        - name: storage
+        - name: grafana-storage
           mountPath: /var/lib/grafana
         resources:
           requests:
@@ -83,15 +97,12 @@ spec:
       volumes:
       - name: dashboards
         configMap:
+          name: grafana-dashboards
+      - name: dashboard-provider
+        configMap:
           name: grafana-dashboard-provider
-          items:
-          - key: dashboards.yaml
-            path: dashboards.yaml
       - name: datasources
         configMap:
           name: grafana-datasources
-          items:
-          - key: datasources.yaml
-            path: datasources.yaml
-      - name: storage
+      - name: grafana-storage
         emptyDir: {}
