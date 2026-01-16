@@ -6,3 +6,13 @@ kubectl -n argocd port-forward svc/argocd-server 8080:443
 Senha inicial:
 
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+Adicionar novo subdominio local
+cloudflared tunnel route dns k8s-local api-staging.fsysolutions.com
+
+Instalar cloudfare local
+cloudflared login
+cloudflared tunnel create k8s-local
+
+Rodar cloudfare local
+cloudflared tunnel run k8s-local -d
