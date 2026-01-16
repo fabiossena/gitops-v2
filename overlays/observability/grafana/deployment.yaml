@@ -40,36 +40,27 @@ spec:
               key: admin-password
         - name: GF_PATHS_PROVISIONING
           value: /etc/grafana/provisioning
+        - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
+          value: /dashboards/default.json
         - name: GF_AUTH_ANONYMOUS_ENABLED
-          value: "true"  # Permite acesso sem login inicialmente
+          value: "false"
         - name: GF_USERS_ALLOW_SIGN_UP
           value: "false"
-        - name: GF_SERVER_ROOT_URL
-          value: "%(protocol)s://%(domain)s:30000/"
-        - name: GF_SECURITY_COOKIE_SECURE
-          value: "false"
-        - name: GF_SECURITY_ALLOW_EMBEDDING
-          value: "true"
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /api/health
             port: 3000
           initialDelaySeconds: 30
           periodSeconds: 10
-          timeoutSeconds: 5
         volumeMounts:
         - name: dashboards
-          mountPath: /etc/grafana/provisioning/dashboards
+          mountPath: /dashboards
           readOnly: true
         - name: datasources
           mountPath: /etc/grafana/provisioning/datasources
+          readOnly: true
+        - name: dashboard-provider
+          mountPath: /etc/grafana/provisioning/dashboards
           readOnly: true
         - name: storage
           mountPath: /var/lib/grafana
@@ -83,15 +74,12 @@ spec:
       volumes:
       - name: dashboards
         configMap:
-          name: grafana-dashboard-provider
-          items:
-          - key: dashboards.yaml
-            path: dashboards.yaml
+          name: grafana-dashboards
       - name: datasources
         configMap:
           name: grafana-datasources
-          items:
-          - key: datasources.yaml
-            path: datasources.yaml
+      - name: dashboard-provider
+        configMap:
+          name: grafana-dashboard-provider
       - name: storage
         emptyDir: {}
