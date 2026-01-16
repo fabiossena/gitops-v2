@@ -1,0 +1,15 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: anchor-api-config
+data:
+  .env: |
+    APP_ENV=production
+    APP_DEBUG=false
+    APP_KEY=base64:HUhVBQ3eihzH9pGxQPKlaC+//1ojieJx4l927CzIPUc=
+    DB_CONNECTION=sqlite
+    DB_DATABASE=/var/www/html/database/database.sqlite
+    CACHE_DRIVER=file
+    CACHE_STORE=file
+    SESSION_DRIVER=file
+    QUEUE_CONNECTION=sync

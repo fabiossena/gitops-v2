@@ -1,0 +1,41 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anchor-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: anchor-api
+  template:
+    metadata:
+      labels:
+        app: anchor-api
+    spec:
+      containers:
+      - name: anchor-api
+        image: ghcr.io/fabiossena/anchor-api:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          # Banco SQLite
+          - name: database-storage
+            mountPath: /var/www/html/database
+          # Arquivo .env
+          - name: anchor-api-config
+            mountPath: /var/www/html/.env
+            subPath: .env
+
+      volumes:
+        # PVC para o SQLite
+        - name: database-storage
+          persistentVolumeClaim:
+            claimName: anchor-api-pvc
+        # ConfigMap para o .env
+        - name: anchor-api-config
+          configMap:
+            name: anchor-api-config
+            items:
+              - key: .env
+                path: .env
