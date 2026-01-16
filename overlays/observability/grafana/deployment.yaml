@@ -97,7 +97,7 @@ spec:
       volumes:
       - name: dashboards
         configMap:
-          name: grafana-dashboards  # Nome deve bater com o ConfigMap
+          name: grafana-dashboards
       - name: dashboard-provider
         configMap:
           name: grafana-dashboard-provider
@@ -105,4 +105,4 @@ spec:
         configMap:
           name: grafana-datasources
       - name: grafana-storage
-        emptyDir: {}  # CONSIDERE usar PVC para produção
+        emptyDir: {}
