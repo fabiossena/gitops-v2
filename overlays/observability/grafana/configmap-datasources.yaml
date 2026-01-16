@@ -9,9 +9,13 @@ data:
   datasources.yaml: |
     apiVersion: 1
     datasources:
-    - name: Prometheus
-      type: prometheus
-      access: proxy
-      url: http://prometheus-server:9090
-      isDefault: true
-      editable: true
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-server:9090
+        isDefault: true
+        editable: true
+        jsonData:
+          timeInterval: 5s
+          httpMethod: POST
+        version: 1

@@ -6,62 +6,321 @@ metadata:
   labels:
     app.kubernetes.io/name: grafana
 data:
+  # Dashboard Node Exporter completo e funcional
   node-exporter.json: |
     {
-      "title": "Node Exporter",
-      "tags": ["prometheus", "node-exporter"],
-      "style": "dark",
-      "timezone": "browser",
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
       "editable": true,
+      "gnetId": 1860,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
       "panels": [
         {
           "datasource": "Prometheus",
+          "description": "Total CPU usage across all cores",
           "fieldConfig": {
             "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
               "custom": {},
+              "decimals": 2,
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "green", "value": null},
-                  {"color": "red", "value": 80}
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 90
+                  }
                 ]
-              }
+              },
+              "unit": "percent"
             },
             "overrides": []
           },
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
-          "id": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 0
+          },
+          "id": 2,
           "options": {
             "colorMode": "value",
             "graphMode": "area",
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": {
-              "calcs": ["lastNotNull"],
+              "calcs": [
+                "lastNotNull"
+              ],
               "fields": "",
               "values": false
             },
             "textMode": "auto"
           },
+          "pluginVersion": "9.4.7",
           "targets": [
             {
-              "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
               "format": "time_series",
-              "legendFormat": "CPU Usage",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "{{instance}}",
               "refId": "A"
             }
           ],
           "title": "CPU Usage",
           "type": "stat"
+        },
+        {
+          "datasource": "Prometheus",
+          "description": "Total memory usage",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {},
+              "decimals": 2,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 90
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 0
+          },
+          "id": 3,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.4.7",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "100 * (1 - ((node_memory_MemAvailable_bytes) / (node_memory_MemTotal_bytes)))",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "{{instance}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Memory Usage",
+          "type": "stat"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "node_filesystem_avail_bytes{mountpoint=\"/\"}",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "{{instance}} - Available",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "node_filesystem_size_bytes{mountpoint=\"/\"} - node_filesystem_avail_bytes{mountpoint=\"/\"}",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{instance}} - Used",
+              "refId": "B"
+            }
+          ],
+          "title": "Disk Usage",
+          "type": "timeseries"
         }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 37,
+      "style": "dark",
+      "tags": [
+        "node-exporter",
+        "prometheus"
       ],
       "templating": {
         "list": [
           {
-            "allValue": null,
-            "current": {},
-            "datasource": "Prometheus",
+            "current": {
+              "selected": true,
+              "text": "Prometheus",
+              "value": "Prometheus"
+            },
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${datasource}"
+            },
+            "definition": "*",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": {
+              "query": "*",
+              "refId": "standard"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "datasource"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": "All",
+              "value": "$__all"
+            },
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${datasource}"
+            },
             "definition": "label_values(node_uname_info, instance)",
             "hide": 0,
             "includeAll": true,
@@ -69,7 +328,10 @@ data:
             "multi": true,
             "name": "instance",
             "options": [],
-            "query": "label_values(node_uname_info, instance)",
+            "query": {
+              "query": "label_values(node_uname_info, instance)",
+              "refId": "A"
+            },
             "refresh": 1,
             "regex": "",
             "skipUrlSync": false,
@@ -78,30 +340,51 @@ data:
           }
         ]
       },
-      "time": {"from": "now-1h", "to": "now"},
-      "refresh": "5s",
-      "schemaVersion": 27,
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "Node Exporter",
       "uid": "node-exporter",
-      "version": 1
+      "version": 1,
+      "weekStart": ""
     }
   
-  default.json: |
+  # Dashboard Home padrão
+  home.json: |
     {
-      "title": "Grafana Home",
-      "tags": [],
+      "title": "Home",
+      "tags": ["home"],
       "style": "dark",
       "timezone": "browser",
-      "editable": true,
+      "editable": false,
       "panels": [
         {
-          "type": "text",
-          "title": "Welcome",
-          "gridPos": {"h": 3, "w": 24, "x": 0, "y": 0},
+          "gridPos": {"h": 5, "w": 24, "x": 0, "y": 0},
           "id": 1,
-          "mode": "markdown",
-          "content": "# Welcome to Grafana"
+          "options": {
+            "content": "# 🚀 Welcome to Grafana\n\n## 📊 Available Dashboards\n\n### 1. **Node Exporter**\n- **ID:** node-exporter\n- **Description:** Monitor your servers with Node Exporter metrics\n- **Access:** Go to Dashboards → Browse → Node Exporter\n\n### 2. **Import More Dashboards**\n1. Click **+ Create** in the sidebar\n2. Select **Import**\n3. Enter Grafana.com Dashboard ID (e.g., 1860 for Node Exporter Full)\n4. Select your Prometheus datasource\n\n## 🔧 Quick Links\n- **Configuration** → Data Sources\n- **Administration** → Users and orgs\n- **Help** → Documentation",
+            "mode": "markdown"
+          },
+          "title": "Welcome",
+          "type": "text"
+        },
+        {
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 5},
+          "id": 2,
+          "options": {
+            "content": "## 📈 Getting Started\n\n### 1. **Verify Data Sources**\n- Ensure Prometheus is running and accessible\n- Check data source configuration\n\n### 2. **Explore Dashboards**\n- Use the sidebar navigation\n- Star frequently used dashboards for quick access\n\n### 3. **Create Alerts**\n- Set up alert rules based on metrics\n- Configure notification channels\n\n### 4. **Customize**\n- Create your own dashboards\n- Add custom panels and queries",
+            "mode": "markdown"
+          },
+          "title": "Getting Started",
+          "type": "text"
         }
       ],
       "time": {"from": "now-6h", "to": "now"},
-      "refresh": "10s"
+      "refresh": "30s",
+      "schemaVersion": 37,
+      "uid": "home",
+      "version": 1
     }

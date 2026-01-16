@@ -3,16 +3,20 @@ kind: ConfigMap
 metadata:
   name: grafana-dashboard-provider
   namespace: observability
+  labels:
+    app.kubernetes.io/name: grafana
 data:
   dashboards.yaml: |
     apiVersion: 1
     providers:
-      - name: 'default'
+      # Provedor para dashboards via ConfigMap
+      - name: 'configmap-dashboards'
         orgId: 1
         folder: ''
         type: file
-        disableDeletion: false
-        editable: true
+        disableDeletion: true  # Não deleta dashboards
         updateIntervalSeconds: 10
+        allowUiUpdates: true   # Permite edições na UI
         options:
-          path: /dashboards
+          path: /etc/grafana/dashboards
+          foldersFromFilesStructure: false

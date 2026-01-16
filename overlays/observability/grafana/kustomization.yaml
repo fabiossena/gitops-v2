@@ -13,4 +13,5 @@ resources:
   - secret-admin.yaml
   - deployment.yaml
   - service.yaml
+  # - configmap-grafana-ini.yaml  # Opcional
   # - ingress.yaml  # Comente se não for usar
