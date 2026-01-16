@@ -21,8 +21,12 @@ configMapGenerator:
   - name: grafana-dashboards
     files:
       - dashboards/node-exporter.json
-      # - dashboards/node-exporter-full.json
+      - dashboards/node-exporter-full.json
       - dashboards/home.json
     options:
       labels:
         app.kubernetes.io/name: grafana
+      # Desabilita annotations grandes do Kustomize
+      disableNameSuffixHash: true
+    # Força uso de binaryData para arquivos grandes
+    behavior: create
