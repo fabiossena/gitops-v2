@@ -1,0 +1,29 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Home",
+    "tags": [],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "hideControls": false,
+    "sharedCrosshair": false,
+    "panels": [
+      {
+        "id": 1,
+        "title": "Bem-vindo ao Observability Stack",
+        "type": "text",
+        "content": "# Dashboards Disponíveis\n\n- **Node Exporter**: Monitoramento de recursos do sistema\n- **Prometheus**: Métricas do servidor Prometheus\n- **Kubernetes**: Monitoramento do cluster K8s\n\n## Acesso Rápido\n\n- Prometheus: http://prometheus-server.observability:9090\n- Grafana: http://localhost:30000 (NodePort)\n\n## Configuração\n\nTodas as configurações são gerenciadas via GitOps com ArgoCD.",
+        "mode": "markdown",
+        "transparent": true
+      }
+    ],
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  },
+  "folderId": 0,
+  "overwrite": false
+}
