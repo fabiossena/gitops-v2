@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  namespace: observability  # Adicione o namespace
+  namespace: observability
   labels:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/part-of: observability
@@ -17,68 +17,9 @@ spec:
         app.kubernetes.io/name: grafana
     spec:
       securityContext:
-        fsGroup: 472  # Usuário grafana
+        fsGroup: 472
         runAsGroup: 472
         runAsUser: 472
-      initContainers:
-      - name: download-dashboards
-        image: curlimages/curl:latest
-        securityContext:
-          runAsUser: 0  # Precisa de root para instalar pacotes
-        command:
-        - /bin/sh
-        - -c
-        - |
-          apk add --no-cache jq
-          DASHBOARDS_DIR="/dashboards"
-          IDS_CONFIG="/config/dashboard-ids.json"
-          
-          # Criar diretório
-          mkdir -p "$DASHBOARDS_DIR"
-          
-          # Verificar se o arquivo de IDs existe
-          if [ ! -f "$IDS_CONFIG" ]; then
-            echo "ERROR: dashboard-ids.json not found"
-            exit 0
-          fi
-          
-          # Baixar dashboards do Grafana.com
-          echo "Downloading dashboards..."
-          jq -c '.[]' "$IDS_CONFIG" | while read -r dashboard; do
-            id=$(echo "$dashboard" | jq -r '.id')
-            name=$(echo "$dashboard" | jq -r '.name')
-            
-            echo "Downloading dashboard $id to $name.json..."
-            
-            # Baixar com retry
-            for i in {1..3}; do
-              if curl -sSL "https://grafana.com/api/dashboards/$id/revisions/1/download" \
-                -o "$DASHBOARDS_DIR/$name.json" && \
-                jq empty "$DASHBOARDS_DIR/$name.json" 2>/dev/null; then
-                echo "✓ Successfully downloaded $name.json"
-                break
-              else
-                echo "Attempt $i failed for $name.json"
-                sleep 2
-                if [ $i -eq 3 ]; then
-                  echo "⚠ Could not download $name.json, skipping..."
-                  # Criar um dashboard vazio para evitar erro
-                  echo '{"title": "Placeholder"}' > "$DASHBOARDS_DIR/$name.json"
-                fi
-              fi
-            done
-          done
-          
-          echo "Total dashboards downloaded: $(ls -1 "$DASHBOARDS_DIR" | wc -l)"
-          
-          # Ajustar permissões para o usuário grafana (472)
-          chown -R 472:472 "$DASHBOARDS_DIR"
-          chmod -R 755 "$DASHBOARDS_DIR"
-        volumeMounts:
-        - name: dashboards
-          mountPath: /dashboards
-        - name: dashboard-ids
-          mountPath: /config
       containers:
       - name: grafana
         image: grafana/grafana:10.2.0
@@ -100,39 +41,23 @@ spec:
         - name: GF_PATHS_PROVISIONING
           value: /etc/grafana/provisioning
         - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
-          value: /dashboards/default.json  # Ajustado
+          value: /dashboards/default.json
         - name: GF_AUTH_ANONYMOUS_ENABLED
           value: "false"
         - name: GF_USERS_ALLOW_SIGN_UP
           value: "false"
-        - name: GF_USERS_ALLOW_ORG_CREATE
-          value: "false"
-        - name: GF_SERVER_ROOT_URL
-          value: "%(protocol)s://%(domain)s:30000"  # Ajuste conforme seu ingress
-        - name: GF_SECURITY_COOKIE_SECURE
-          value: "false"  # Se não usar HTTPS
-        - name: GF_SECURITY_ALLOW_EMBEDDING
-          value: "true"
         readinessProbe:
           httpGet:
             path: /api/health
             port: 3000
           initialDelaySeconds: 30
           periodSeconds: 10
-          timeoutSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 5
         volumeMounts:
-        - name: datasources
-          mountPath: /etc/grafana/provisioning/datasources
-          readOnly: true
         - name: dashboards
           mountPath: /dashboards
+          readOnly: true
+        - name: datasources
+          mountPath: /etc/grafana/provisioning/datasources
           readOnly: true
         - name: dashboard-provider
           mountPath: /etc/grafana/provisioning/dashboards
@@ -147,16 +72,14 @@ spec:
             memory: "512Mi"
             cpu: "500m"
       volumes:
+      - name: dashboards
+        configMap:
+          name: grafana-dashboards
       - name: datasources
         configMap:
           name: grafana-datasources
       - name: dashboard-provider
         configMap:
           name: grafana-dashboard-provider
-      - name: dashboard-ids
-        configMap:
-          name: grafana-dashboard-ids
-      - name: dashboards
-        emptyDir: {}
       - name: storage
         emptyDir: {}

@@ -8,7 +8,7 @@ commonLabels:
 
 resources:
   - configmap-dashboard-provider.yaml
-  - configmap-dashboard-ids.yaml
+  - configmap-dashboards.yaml
   - configmap-datasources.yaml
   - secret-admin.yaml
   - deployment.yaml
