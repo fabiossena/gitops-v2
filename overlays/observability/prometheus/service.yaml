@@ -1,14 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus
+  name: prometheus-server
+  namespace: observability
   labels:
+    app: prometheus
     app.kubernetes.io/name: prometheus
 spec:
   selector:
-    app.kubernetes.io/name: prometheus
+    app: prometheus  # Isso deve corresponder aos labels do seu pod
   ports:
-  - name: web
+  - name: http
     port: 9090
     targetPort: 9090
   type: ClusterIP
