@@ -17,7 +17,7 @@ commonLabels:
 configMapGenerator:
 - name: postgres-init-scripts
   files:
-  - platform/environments/base/database/postgres/init.sql
+  - init.sql
   
 secretGenerator:
 - name: postgres-secret
