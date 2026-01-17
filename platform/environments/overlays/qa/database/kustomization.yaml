@@ -1,0 +1,7 @@
+resources:
+  - ../../../base/database
+
+namespace: qa-database
+
+# patchesStrategicMerge:
+#   - patch-replicas.yaml

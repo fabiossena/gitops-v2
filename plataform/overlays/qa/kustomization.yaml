@@ -1,7 +1,0 @@
-resources:
-  - ../../base
-
-namespace: qa-database
-
-# patchesStrategicMerge:
-#   - patch-resources.yaml

@@ -1,7 +1,0 @@
-resources:
-  - ../../base
-
-namespace: production-database
-
-# patchesStrategicMerge:
-#   - patch-replicas.yaml

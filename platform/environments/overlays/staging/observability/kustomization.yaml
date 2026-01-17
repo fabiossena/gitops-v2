@@ -1,0 +1,7 @@
+resources:
+  - ../../../base/observability
+
+namespace: staging-observability
+
+# patchesStrategicMerge:
+#   - patch-replicas.yaml

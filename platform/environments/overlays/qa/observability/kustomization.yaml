@@ -1,0 +1,7 @@
+resources:
+  - ../../../base/observability
+
+namespace: qa-observability
+
+# patchesStrategicMerge:
+#   - patch-replicas.yaml

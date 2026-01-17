@@ -1,0 +1,7 @@
+resources:
+  - ../../../base/database
+
+namespace: staging-database
+
+# patchesStrategicMerge:
+#   - patch-replicas.yaml
