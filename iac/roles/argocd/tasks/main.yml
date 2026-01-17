@@ -127,6 +127,12 @@
     src: app-of-main-observability.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/app-observability-main.yaml
 
+- name: Deploy Production database
+  template:
+    src: app-of-apps-database.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/production-database.yaml
+  vars:
+    overlay: production
     
 - name: Get initial admin password
   shell: |
