@@ -1,170 +1,169 @@
+# Infrastructure Setup Guide
 
-Infra — README
+## Prerequisites
 
 Requisitos
+
 - Git
-- Terraform
-- Ansible
+- Terraformmelhorar todo markdown
+- Tested on Debian
+- Testado no Debian
 
-Instalar Terraform
+## 1. Ansible Setup
 
-Windows (via winget):
+1. ANSIBLE
 
-```
-winget install Hashicorp.Terraform
-```
-
-Debian / Ubuntu:
-
-```
-sudo apt update
-sudo apt install -y gnupg software-properties-common curl
-curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor \
-  -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-sudo apt update
-sudo apt install -y terraform
-terraform version
-```
+### Installation Instructions
 
 Instalar Ansible
 
-Windows (via pip):
+#### Windows (via pip)python -m pip install --upgrade pip
 
-```
 python -m pip install --upgrade pip
 python -m pip install ansible
-ansible --version
-```
 
+#### Windows (via pip)bash
+
+````
+#### Debian / Ubuntu
+```bash
 Debian / Ubuntu:
-
-```
+#### Debian / Ubuntusudo apt update
 sudo apt update
 sudo apt install -y software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
+
+#### Debian / Ubuntusudo apt --upgrade pip
+python -m pip install ansible update
+sudo apt install -y software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install -y ansible
-ansible --version
-```
+####
+sudo apt install -y ansible
+````
 
-macOS (via Homebrew):
+#### macOS (via Homebrew)brew install ansible
 
-```
 brew install ansible
+
+```brew install ansible
 ansible --version
 ```
 
-Configurar inventário
-- Edite `infra/inventory/hosts.yaml` com os IPs/hosts de destino.
-- Se preferir formato INI, há um exemplo em `infra/inventory/OLD_hosts.ini`.
+### Prerequisites
 
+When starting with a fresh Linux installation, if you encounter errors, run either:./scripts/00-bootstrap.sh
 
-Antes de executar o ansible instalar o script no servidor destino: (ver se vale a pena juntar com o playbook/bootstrap.yml exceto o python que é requisito)
-```
-infra\scripts\00-bootstrap.sh (se não rodar o playbook/bootstrap.yml)
-sudo apt install -y python3 python3-apt
-```
+# OR
 
+Ou
+
+````
+### Inventory Configuration
+- Configure target hosts in `inventory/hosts.yaml`
+- Alternative INI format available at `inventory/OLD_hosts.ini`
+
+### Execution Commands
+
+#### Standard Execution
+Navigate to ansible directory:cd iac/ansible/
+- Se preferir formato INI, há um exemplo em `inventory/OLD_hosts.ini`.
+Run playbook:
+```bashansible/
+
+Run playbook:ansible-playbook site.yml -e bootstrap_enabled=true --ask-pass --ask-become-pass
+
+#### Tag-based Execution
+```pass
 Como executar (Ansible)
-
+#### Tag-based Execution# Single tag
+ansible-playbook site.yml -e bootstrap_enabled=true --ask-pass --ask-become-pass --tags [base|k3s|argocd|k9s]
 Execução normal:
+# Multiple tags
+ansible-playbook site.yml -e bootstrap_enabled=true --ask-pass --ask-become-pass  --tags base ou k3s ou argocd ou k9s
+````
 
+#### Verification
 
-ansible-playbook iac/ansible/playbooks/bootstrap.yml -e bootstrap_enabled=true --ask-pass --ask-become-pass
+```bash
+#
 
-```
-ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml --ask-pass --ask-become-pass
-ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/site.yml --ask-pass --ask-become-pass
-```
-
-Verificar
-```
-ansible-playbook -i infra/ansible/inventory/hosts.yaml \
-    infra/site.yml --ask-pass --ask-become-pass --check --diff
+#### Verification# Check configuration
 ```
 
-Executar apenas uma etapa (tag):
+# Check with specific inventory
 
+ansible-playbook site.yml --ask-pass --ask-become-pass --check --diff
+
+````
+#### Rollback (Beta)
+```bash
+
+#### Rollback (Beta)ansible-playbook -i inventory/hosts.yaml playbooks/bootstrap.yml \
+ansible-playbook -i inventory/hosts.yaml playbooks/bootstrap.yml \
+````
+
+## 2. Terraform Setup
+
+### Installation Instructions
+
+Instalar Terraform
+
+#### Windows (via winget)winget install Hashicorp.Terraform
+
+Windows (via winget):
+
+#### Debian / Ubuntu
+
+```bash
+su
 ```
-ansible-playbook -i infra/ansible/inventory/hosts.yaml     infra/site.yml --ask-pass --ask-become-pass --tags k3s
-ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml --tags ssh
-```
 
-Rollback (via Ansible):
+#### Debian / Ubuntusudo apt update
 
-```
-ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml \
-  --tasks-from-file infra/ansible/roles/base/tasks/rollback.yml --tags rollback
-```
+sudo apt update
+sudo apt install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor \
+ -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+sudo apt update
+sudo apt install -y terraform
 
-Exemplos de uso com Terraform
+````
+### Usage Examples
 
-Execução normal (Terraform irá aplicar o plano que chama Ansible):
+#### Apply Configuration
+```bash
+````
 
-```
-terraform apply
-```
+#### Cleanup Usage Examples
 
-Executar apenas uma etapa do Ansible através do `ansible_extra_args`:
-
-```
-terraform apply -var='ansible_extra_args=--tags ssh'
-```
-
+````
+#### Apply Configurationbash and Destruction
 Limpeza e Destruição
-
+##### Option 1: Complete Infrastructure Removalterraform destroy
+``` Infrastructure Removalterraform destroy
 **Opção 1: Destruir tudo (VMs, networks, K3s, ArgoCD)**
-
+This will remove:
+- Virtual machines/hosts
+- Network configurations
+- State data
 Use `terraform destroy` para remover toda a infraestrutura gerenciada por Terraform:
+## 3. Access and Important Commands
+````
 
-```
-terraform destroy
-```
+### ArgoCD Access# Get services
 
-Escolha `yes` quando solicitado. Isso remove:
-- Máquinas virtuais/hosts
-- Redes e configurações de rede
+kubectl -n argocd get svc
+
 - Dados de estado
 
-**Opção 2: Rollback parcial (remove K3s e ArgoCD, mantém SO)**
+# Port forwarding
 
-Execute rollback via Terraform/Ansible se quiser manter a infraestrutura base:
-
-```
-terraform apply -var='ansible_extra_args=--tasks-from-file infra/ansible/roles/base/tasks/rollback.yml --tags rollback'
-```
-
-Ou diretamente via Ansible:
-
-```
-ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml \
-  --tasks-from-file infra/ansible/roles/base/tasks/rollback.yml --tags rollback
-```
-
-Isso:
-- Remove ArgoCD namespace
-- Executa `k3s-uninstall.sh` (limpeza oficial do K3s)
-- Desativa SSH
-- Remove pacotes base
-
-**Opção 3: Apenas uninstalar K3s (manual)**
-
-Se estiver logado no host destino:
-
-```
-/usr/local/bin/k3s-uninstall.sh
-```
-
-Observações
-- Ajuste `infra/inventory/hosts.yaml` antes de executar as playbooks.
-- Verifique permissões/SSH entre a máquina de controle e os nós gerenciados.
-
-
-🔐 ACESSO AO ArgoCD
 kubectl -n argocd get svc
 kubectl -n argocd port-forward svc/argocd-server 8080:443
 
+# Get initial admin password
 
 Senha inicial:
-
 kubectl -n argocd get secret argocd-initial-admin-secret \
 -o jsonpath="{.data.password}" | base64 -d
