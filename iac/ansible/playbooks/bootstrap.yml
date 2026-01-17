@@ -1,7 +1,12 @@
 - name: Debian Bootstrap
   hosts: debian
   become: true
+  serial: 1
+
+  vars:
+    bootstrap_enabled: false
 
   roles:
     - role: base
       tags: [base]
+      when: bootstrap_enabled | bool

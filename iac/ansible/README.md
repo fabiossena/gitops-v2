@@ -68,6 +68,9 @@ Como executar (Ansible)
 
 Execução normal:
 
+
+ansible-playbook iac/ansible/playbooks/bootstrap.yml -e bootstrap_enabled=true --ask-pass --ask-become-pass
+
 ```
 ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/ansible/playbooks/bootstrap.yml --ask-pass --ask-become-pass
 ansible-playbook -i infra/ansible/inventory/hosts.yaml infra/site.yml --ask-pass --ask-become-pass
