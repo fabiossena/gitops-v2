@@ -19,9 +19,9 @@ configMapGenerator:
   files:
   - init.sql
   
-secretGenerator:
-- name: postgres-secret
-  literals:
-  - username=postgres
-  - password=senha-segreda
-  - database=appdb
+# secretGenerator:
+# - name: postgres-secret
+#   literals:
+#   - username=postgres
+#   - password=senha-segreda
+#   - database=appdb
