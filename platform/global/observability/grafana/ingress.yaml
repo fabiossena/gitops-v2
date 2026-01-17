@@ -13,7 +13,7 @@ metadata:
 spec:
   ingressClassName: traefik  # Altere para 'nginx' ou outro se necessário
   rules:
-  - host: app-qa.fsysolutions.com  # Altere para seu domínio (ex: grafana.seudominio.com) ou use "*" para qualquer host
+  - host: grafana.fsysolutions.com  # Altere para seu domínio (ex: grafana.seudominio.com) ou use "*" para qualquer host
     http:
       paths:
       - path: /
@@ -22,4 +22,4 @@ spec:
           service:
             name: grafana
             port:
-              number: 30000
+              number: 80
