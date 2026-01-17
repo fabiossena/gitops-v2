@@ -11,7 +11,7 @@ metadata:
     # Para nginx-ingress, descomente a linha abaixo e remova a do Traefik
     # nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: traefik  # Altere para 'nginx' ou outro se necessário
+  ingressClassName: traefik
   rules:
   - host: grafana.fsysolutions.com  # Altere para seu domínio (ex: grafana.seudominio.com) ou use "*" para qualquer host
     http:
@@ -22,4 +22,4 @@ spec:
           service:
             name: grafana
             port:
-              number: 30000
+              number: 3000
