@@ -22,4 +22,4 @@ spec:
           service:
             name: grafana
             port:
-              number: 3000
+              number: 30000
