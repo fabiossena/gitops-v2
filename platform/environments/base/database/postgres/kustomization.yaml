@@ -5,7 +5,7 @@ resources:
 - deployment.yaml
 - service.yaml
 - configmap.yaml
-- secret.yaml
+- secrets.yaml
 - pvc.yaml
 
 commonLabels:
