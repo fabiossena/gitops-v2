@@ -23,7 +23,7 @@ configMapGenerator:
     files:
       - dashboards/node-exporter.json
       - dashboards/node-exporter-full-clean.json
-      - dashboards/kubernetes-global.json
+      # - dashboards/kubernetes-global.json
       # - dashboards/kubernetes-node.json
       # - dashboards/home.json
     options:
