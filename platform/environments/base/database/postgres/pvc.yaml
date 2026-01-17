@@ -4,11 +4,11 @@ metadata:
   name: postgres-pvc
   labels:
     app: postgres
-    component: relational
+    component: database
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
-  storageClassName: standard
+  # storageClassName: standard
