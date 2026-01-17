@@ -9,13 +9,6 @@
       tags: k3s
     - role: argocd
       tags: argocd
-      # vars:
-      #   k3s_version: "v1.27.10+k3s1"
-      #   argocd_namespace: "argocd"
-      #   argocd_server_nodeport: 30007
-      #   ansible_user_home: "/home/{{ ansible_user | default('ubuntu') }}"
-      #   k3s_manifest_dir: /var/lib/rancher/k3s/server/manifests
-      #   argocd_nodeport: 30007
     - role: k9s
       tags: k9s
 
