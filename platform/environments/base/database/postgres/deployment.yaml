@@ -43,7 +43,10 @@ spec:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
         - name: postgres-config
-          mountPath: /etc/postgresql
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        - name: postgres-init
+          mountPath: /docker-entrypoint-initdb.d/
         resources:
           requests:
             memory: "256Mi"
@@ -54,26 +57,18 @@ spec:
         readinessProbe:
           exec:
             command:
-            - pg_isready
-            - -U
-            - $(POSTGRES_USER)
-            - -h
-            - localhost
-            - -p
-            - "5432"
+            - sh
+            - -c
+            - pg_isready -U $POSTGRES_USER -h localhost -p 5432
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
         livenessProbe:
           exec:
             command:
-            - pg_isready
-            - -U
-            - $(POSTGRES_USER)
-            - -h
-            - localhost
-            - -p
-            - "5432"
+            - sh
+            - -c
+            - pg_isready -U $POSTGRES_USER -h localhost -p 5432
           initialDelaySeconds: 60
           periodSeconds: 20
           timeoutSeconds: 5
@@ -84,3 +79,6 @@ spec:
       - name: postgres-config
         configMap:
           name: postgres-config
+      - name: postgres-init
+        configMap:
+          name: postgres-init-scripts

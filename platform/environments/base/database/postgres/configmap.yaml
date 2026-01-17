@@ -6,7 +6,6 @@ metadata:
     app: postgres
     component: database
 data:
-  database: "appdb"
   postgresql.conf: |
     # PostgreSQL Configuration
     max_connections = 100

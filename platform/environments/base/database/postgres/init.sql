@@ -1,4 +1,4 @@
--- init.sql - Scripts de inicialização do PostgreSQL
+-- Scripts de inicialização do PostgreSQL
 -- Este script é executado quando o container PostgreSQL inicia pela primeira vez
 
 -- Criar extensões padrão

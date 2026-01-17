@@ -2,11 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- deployment.yaml
-- service.yaml
-- configmap.yaml
-- secrets.yaml
-- pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - pvc.yaml
+  - secret.yaml
+  - configmap.yaml
 
 commonLabels:
   app: postgres
@@ -15,13 +15,13 @@ commonLabels:
   part-of: platform
 
 configMapGenerator:
-- name: postgres-init-scripts
-  files:
-  - init.sql
-  
-# secretGenerator:
+  - name: postgres-init-scripts
+    files:
+      - init.sql
+
+# secretGenerator (comente se estiver usando secret.yaml)
 # - name: postgres-secret
 #   literals:
-#   - username=postgres
-#   - password=senha-segreda
-#   - database=appdb
+#     - username=postgres
+#     - password=senha-segreda
+#     - database=appdb
