@@ -4,7 +4,7 @@ metadata:
   name: postgres-config
   labels:
     app: postgres
-    component: relational
+    component: database
 data:
   database: "appdb"
   postgresql.conf: |

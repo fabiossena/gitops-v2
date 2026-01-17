@@ -10,7 +10,7 @@ resources:
 
 commonLabels:
   app: postgres
-  component: relational
+  component: database
   managed-by: kustomize
   part-of: platform
 

@@ -4,7 +4,7 @@ metadata:
   name: postgres
   labels:
     app: postgres
-    component: relational
+    component: database
 spec:
   replicas: 1
   selector:
@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: postgres
-        component: relational
+        component: database
     spec:
       containers:
       - name: postgres
