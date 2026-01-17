@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-config
+  labels:
+    app: cassandra
+    component: nosql
+data:
+  cassandra.yaml: |
+    cluster_name: 'cassandra-cluster'
+    num_tokens: 256
+    hinted_handoff_enabled: true
+    max_hint_window_in_ms: 10800000
+    hinted_handoff_throttle_in_kb: 1024
+    max_hints_delivery_threads: 2
+    authenticator: PasswordAuthenticator
+    authorizer: CassandraAuthorizer
+    role_manager: CassandraRoleManager
+    roles_validity_in_ms: 2000
+    permissions_validity_in_ms: 2000
+    partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+    data_file_directories:
+      - /var/lib/cassandra/data
+    commitlog_directory: /var/lib/cassandra/commitlog
+    cdc_raw_directory: /var/lib/cassandra/cdc_raw
+    saved_caches_directory: /var/lib/cassandra/saved_caches
+    commitlog_segment_size_in_mb: 32
+    seed_provider:
+      - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+        parameters:
+          - seeds: "cassandra-0.cassandra,cassandra-1.cassandra,cassandra-2.cassandra"
+    concurrent_reads: 32
+    concurrent_writes: 32
+    concurrent_counter_writes: 32
+    memtable_allocation_type: heap_buffers
+    index_summary_capacity_in_mb: 250
+    storage_port: 7000
+    ssl_storage_port: 7001
+    listen_address: ${POD_IP}
+    start_native_transport: true
+    native_transport_port: 9042
+    start_rpc: true
+    rpc_address: ${POD_IP}
+    rpc_port: 9160
+    rpc_keepalive: true
+    endpoint_snitch: GossipingPropertyFileSnitch

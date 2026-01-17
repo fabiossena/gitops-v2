@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-config
+  labels:
+    app: influxdb
+    component: timeseries
+data:
+  config.toml: |
+    reporting-disabled = false
+    bind-address = ":8088"
+    
+    [meta]
+      dir = "/var/lib/influxdb/meta"
+      retention-autocreate = true
+      logging-enabled = true
+    
+    [data]
+      dir = "/var/lib/influxdb/data"
+      wal-dir = "/var/lib/influxdb/wal"
+      index-version = "inmem"
+      query-log-enabled = true
+      cache-max-memory-size = 1073741824
+      cache-snapshot-memory-size = 26214400
+      cache-snapshot-write-cold-duration = "10m0s"
+      compact-full-write-cold-duration = "4h0s"
+      max-series-per-database = 1000000
+      max-values-per-tag = 100000
+      trace-logging-enabled = false
+    
+    [coordinator]
+      write-timeout = "10s"
+      max-concurrent-queries = 0
+      query-timeout = "0s"
+      log-queries-after = "0s"
+      max-select-point = 0
+      max-select-series = 0
+      max-select-buckets = 0
+    
+    [retention]
+      enabled = true
+      check-interval = "30m0s"
+    
+    [shard-precreation]
+      enabled = true
+      check-interval = "10m"
+      advance-period = "30m"
+    
+    [admin]
+      enabled = true
+      bind-address = ":8083"
+      https-enabled = false
+      https-certificate = "/etc/ssl/influxdb.pem"

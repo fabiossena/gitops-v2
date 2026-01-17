@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redpanda
+  labels:
+    app: redpanda
+    component: messaging
+spec:
+  serviceName: redpanda
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redpanda
+  template:
+    metadata:
+      labels:
+        app: redpanda
+        component: messaging
+    spec:
+      containers:
+      - name: redpanda
+        image: vectorized/redpanda:v23.2.5
+        command: 
+        - /bin/bash
+        - -ecx
+        - |
+          export REDPANDA_RPC_PORT=33145
+          export REDPANDA_KAFKA_API_PORT=9092
+          export REDPANDA_ADMIN_PORT=9644
+          
+          /usr/bin/rpk redpanda start \
+            --mode dev-container \
+            --smp 1 \
+            --memory 1G \
+            --reserve-memory 0M \
+            --overprovisioned \
+            --node-id ${HOSTNAME##*-} \
+            --check=false \
+            --advertise-kafka-addr $(hostname -f):9092 \
+            --kafka-addr 0.0.0.0:9092
+        ports:
+        - containerPort: 9092
+        - containerPort: 9644
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: redpanda-data
+          mountPath: /var/lib/redpanda/data
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        readinessProbe:
+          tcpSocket:
+            port: 9092
+          initialDelaySeconds: 30
+          periodSeconds: 10
+  volumeClaimTemplates:
+  - metadata:
+      name: redpanda-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi

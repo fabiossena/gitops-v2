@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- statefulset.yaml
+- service.yaml
+- service-client.yaml
+- zookeeper-statefulset.yaml
+- zookeeper-service.yaml
+- configmap.yaml
+- zookeeper-config.yaml
+- secret.yaml
+
+commonLabels:
+  app: kafka
+  component: messaging
+  managed-by: kustomize
+  part-of: platform
+
+secretGenerator:
+- name: kafka-secret
+  literals:
+  - username=kafka
+  - password=senha-segreda

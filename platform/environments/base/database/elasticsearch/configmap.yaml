@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch-config
+  labels:
+    app: elasticsearch
+    component: search
+data:
+  elasticsearch.yml: |
+    cluster.name: elasticsearch-cluster
+    node.name: ${HOSTNAME}
+    network.host: 0.0.0.0
+    http.port: 9200
+    transport.port: 9300
+    discovery.seed_hosts: elasticsearch-0.elasticsearch,elasticsearch-1.elasticsearch,elasticsearch-2.elasticsearch
+    cluster.initial_master_nodes: elasticsearch-0,elasticsearch-1,elasticsearch-2
+    node.roles: [master,data,ingest]
+    xpack.security.enabled: true
+    xpack.security.transport.ssl.enabled: true
+    xpack.security.transport.ssl.verification_mode: certificate
+    xpack.security.transport.ssl.keystore.path: certs/elastic-certificates.p12
+    xpack.security.transport.ssl.truststore.path: certs/elastic-certificates.p12
+    xpack.security.http.ssl.enabled: false
+    xpack.monitoring.collection.enabled: true
+    path.data: /usr/share/elasticsearch/data
+    path.logs: /usr/share/elasticsearch/logs
+    http.cors.enabled: true
+    http.cors.allow-origin: "*"
+    http.cors.allow-headers: X-Requested-With,Content-Type,Content-Length,Authorization

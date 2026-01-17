@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- statefulset.yaml
+- service.yaml
+- service-client.yaml
+- configmap.yaml
+- secret.yaml
+
+commonLabels:
+  app: redpanda
+  component: messaging
+  managed-by: kustomize
+  part-of: platform
+
+secretGenerator:
+- name: redpanda-secret
+  literals:
+  - admin-user=admin
+  - admin-password=senha-segreda
+  - superuser=redpanda
+  - superuser-password=senha-segreda

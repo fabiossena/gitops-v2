@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- statefulset.yaml
+- service.yaml
+- service-client.yaml
+- configmap.yaml
+- secret.yaml
+
+commonLabels:
+  app: cassandra
+  component: nosql
+  managed-by: kustomize
+  part-of: platform
+
+secretGenerator:
+- name: cassandra-secret
+  literals:
+  - username=cassandra
+  - password=senha-segreda
+  - superuser-username=cassandra
+  - superuser-password=senha-segreda
