@@ -14,10 +14,10 @@ commonLabels:
   managed-by: kustomize
   part-of: platform
 
-# configMapGenerator:
-# - name: postgres-init-scripts
-#   files:
-#   - init.sql
+configMapGenerator:
+- name: postgres-init-scripts
+  files:
+  - init.sql
   
 secretGenerator:
 - name: postgres-secret
