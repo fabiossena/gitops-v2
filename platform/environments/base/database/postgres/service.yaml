@@ -4,12 +4,12 @@ metadata:
   name: postgres
   labels:
     app: postgres
-    component: relational
+    component: database
 spec:
+  type: NodePort
   selector:
     app: postgres
   ports:
-  - name: postgres
-    port: 5432
+  - port: 5432
     targetPort: 5432
-  type: ClusterIP
+    nodePort: 30432  # Entre 30000-32767
