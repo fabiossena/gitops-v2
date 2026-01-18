@@ -4,10 +4,11 @@ kind: Kustomization
 # namespace: observability
 
 resources:
-  # - namespace.yaml
-  - node-exporter
-  - prometheus
-  - grafana
+  # - namespace.yaml # it comes from the app ArgoCD
+
+  # - node-exporter
+  # - prometheus
+  # - grafana
 
   - clickvisual
   - telescope
