@@ -25,6 +25,17 @@ spec:
         - name: config
           mountPath: /etc/clickhouse-server/config.xml
           subPath: clickhouse-server.xml
+        env:
+        - name: CLICKHOUSE_USER
+          valueFrom:
+            secretKeyRef:
+              name: clickhouse-secret
+              key: user
+        - name: CLICKHOUSE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: clickhouse-secret
+              key: password
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -33,7 +44,3 @@ spec:
       resources:
         requests:
           storage: 50Gi
-  volumes:
-    - name: config
-      configMap:
-        name: clickhouse-config
