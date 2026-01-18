@@ -5,7 +5,7 @@ metadata:
 data:
   default.toml: |
     [mysql]
-    dsn = "root:password123@tcp(mysql:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
+    dsn = "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
 
     [clickhouse]
     host = "clickhouse"

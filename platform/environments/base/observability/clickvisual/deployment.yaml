@@ -7,20 +7,23 @@ spec:
   selector:
     matchLabels:
       app: clickvisual
-  
   template:
     metadata:
       labels:
         app: clickvisual
-    
     spec:
       imagePullSecrets:
         - name: ghcr-secret
       containers:
         - name: clickvisual
-          image: ghcr.io/fabiossena/clickvisual:v1.1.5
+          image: clickvisual/clickvisual:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
+
+          envFrom:
+            - secretRef:
+                name: clickvisual-secret
 
           volumeMounts:
             - name: config
