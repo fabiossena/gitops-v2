@@ -6,7 +6,7 @@ all:
         localhost:
           ansible_connection: local
           ansible_user: fabiossena
-          ansible_become: true
+          ansible_become: no
           ansible_become_method: sudo
           ansible_python_interpreter: /usr/bin/python3.13
           # ansible_python_interpreter pode ser adicionado se Python estiver em caminho não padrão

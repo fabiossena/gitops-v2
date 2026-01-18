@@ -56,8 +56,6 @@ When starting with a fresh Linux installation, if you encounter errors, run eith
 
 # OR
 
-Ou
-
 ````
 ### Inventory Configuration
 - Configure target hosts in `inventory/hosts.yaml`
@@ -69,7 +67,7 @@ Ou
 Navigate to ansible directory:cd iac/ansible/
 - Se preferir formato INI, há um exemplo em `inventory/OLD_hosts.ini`.
 Run playbook:
-```bashansible/
+```bash ansible/
 
 Run playbook:ansible-playbook site.yml -e bootstrap_enabled=true --ask-pass --ask-become-pass
 
