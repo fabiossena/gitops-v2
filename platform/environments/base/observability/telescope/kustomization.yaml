@@ -2,13 +2,13 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - deployment.yaml
-  - service.yaml
   - configmap.yaml
   - secret.yaml
   - pvc.yaml
+  - deployment.yaml
+  - service.yaml
 
-# secretGenerator:
-# - name: telescope-secret
-#   files:
-#     - secret.yaml
+commonLabels:
+  app: telescope
+  component: observability
+  managed-by: kustomize

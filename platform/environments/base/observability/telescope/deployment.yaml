@@ -16,11 +16,18 @@ spec:
     spec:
       containers:
       - name: telescope
-        image: mozilla/telescope:v6.20.0
+        image: mozilla/telescope:v6.20.0  # escolha a tag que deseja
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: telescope-config
+        - secretRef:
+            name: telescope-secret
         volumeMounts:
         - name: telescope-config
-          mountPath: /config.toml   # caminho esperado pelo app
-          subPath: config.toml      # nome do arquivo dentro do volume
+          mountPath: /config.toml
+          subPath: config.toml
         - name: telescope-data
           mountPath: /data
       volumes:
