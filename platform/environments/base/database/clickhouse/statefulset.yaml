@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: clickhouse
 spec:
-  serviceName: "clickhouse"
+  serviceName: clickhouse
   replicas: 1
   selector:
     matchLabels:
@@ -19,12 +19,15 @@ spec:
         ports:
         - containerPort: 9000
         - containerPort: 8123
+
         volumeMounts:
         - name: data
           mountPath: /var/lib/clickhouse
+
         - name: config
           mountPath: /etc/clickhouse-server/config.xml
           subPath: clickhouse-server.xml
+
         env:
         - name: CLICKHOUSE_USER
           valueFrom:
@@ -36,11 +39,18 @@ spec:
             secretKeyRef:
               name: clickhouse-secret
               key: password
+
+      volumes:
+      - name: config
+        configMap:
+          name: clickhouse-config
+
   volumeClaimTemplates:
   - metadata:
       name: data
     spec:
-      accessModes: ["ReadWriteOnce"]
+      accessModes:
+        - ReadWriteOnce
       resources:
         requests:
           storage: 50Gi
