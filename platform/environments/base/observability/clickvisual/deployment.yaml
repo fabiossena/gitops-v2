@@ -17,14 +17,20 @@ spec:
           image: clickvisual/clickvisual:latest
           ports:
             - containerPort: 3000
-          envFrom:
-            - configMapRef:
-                name: clickvisual-config
-            - secretRef:
-                name: clickvisual-secret
+
+          volumeMounts:
+            - name: config
+              mountPath: /clickvisual/config/default.toml
+              subPath: default.toml
+
           readinessProbe:
             httpGet:
               path: /
               port: 3000
             initialDelaySeconds: 30
             periodSeconds: 10
+
+      volumes:
+        - name: config
+          configMap:
+            name: clickvisual-config
