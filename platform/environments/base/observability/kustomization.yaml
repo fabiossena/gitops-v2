@@ -1,17 +1,13 @@
 ﻿apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# namespace: observability
-
 resources:
-  # - namespace.yaml # it comes from the app ArgoCD
-
-  # - node-exporter
-  # - prometheus
+  # - clickvisual
+  # - telescope
   # - grafana
-
-  - clickvisual
-  - telescope
+  - prometheus
+  - node-exporter
 
 commonLabels:
   app.kubernetes.io/part-of: observability
+  managed-by: kustomize
