@@ -12,11 +12,10 @@ spec:
     metadata:
       labels:
         app: clickvisual
+    
     spec:
       imagePullSecrets:
         - name: ghcr-secret
-
-    spec:
       containers:
         - name: clickvisual
           image: ghcr.io/clickvisual/clickvisual:v1.1.5
