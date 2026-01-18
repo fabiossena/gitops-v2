@@ -23,8 +23,9 @@ spec:
         - name: data
           mountPath: /var/lib/clickhouse
         - name: config
-          mountPath: /etc/clickhouse-server/config.xml
-          subPath: clickhouse-server.xml
+          mountPath: /etc/clickhouse-server
+          # mountPath: /etc/clickhouse-server/config.xml
+          # subPath: clickhouse-server.xml
       volumes:
       - name: config
         configMap:
