@@ -6,34 +6,36 @@ metadata:
     app: telescope
 spec:
   replicas: 1
+
   selector:
     matchLabels:
-      app: telescope
+      app: telescope   # 🔒 IMUTÁVEL
+
   template:
     metadata:
       labels:
-        app: telescope
+        app: telescope # 🔒 IGUAL AO SELECTOR
     spec:
       containers:
-      - name: telescope
-        image: mozilla/telescope:v6.20.0  # escolha a tag que deseja
-        ports:
-        - containerPort: 8080
-        envFrom:
-        - configMapRef:
-            name: telescope-config
-        - secretRef:
-            name: telescope-secret
-        volumeMounts:
-        - name: telescope-config
-          mountPath: /config.toml
-          subPath: config.toml
-        - name: telescope-data
-          mountPath: /data
+        - name: telescope
+          image: mozilla/telescope:v6.20.0
+
+          ports:
+            - containerPort: 8080
+
+          volumeMounts:
+            - name: telescope-config
+              mountPath: /config.toml
+              subPath: config.toml
+
+            - name: telescope-data
+              mountPath: /data
+
       volumes:
-      - name: telescope-config
-        configMap:
-          name: telescope-config
-      - name: telescope-data
-        persistentVolumeClaim:
-          claimName: telescope-pvc
+        - name: telescope-config
+          configMap:
+            name: telescope-config
+
+        - name: telescope-data
+          persistentVolumeClaim:
+            claimName: telescope-pvc

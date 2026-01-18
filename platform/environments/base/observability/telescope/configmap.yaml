@@ -4,16 +4,15 @@ metadata:
   name: telescope-config
 data:
   config.toml: |
-    [general]
-    log_level = "info"
+    [server]
+    host = "0.0.0.0"
     port = 8080
 
-    [clickhouse]
-    host = "clickhouse"
-    port = 8123
-    database = "default"
-
     [checks]
-    example_project = [
-      { name = "check_1", type = "ping", target = "localhost" }
-    ]
+
+      [checks.httpbin]
+        [[checks.httpbin.entries]]
+        name = "httpbin-status"
+        url = "https://httpbin.org/status/200"
+        interval = 60
+        timeout = 5
