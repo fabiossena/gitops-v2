@@ -2,33 +2,29 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: telescope
-  labels:
-    app: telescope
 spec:
   replicas: 1
-
   selector:
     matchLabels:
       app: telescope
-
   template:
     metadata:
       labels:
         app: telescope
     spec:
       containers:
-      - name: telescope
-        image: mozilla/telescope:v6.20.0
-
-        ports:
-        - containerPort: 8080
-
-        volumeMounts:
-        - name: config-volume
-          mountPath: /app/telescope/config.toml
-          subPath: config.toml  # Important for single files
-
+        - name: telescope
+          image: mozilla/telescope:v6.20.0
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: telescope-secret
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config.toml
+              subPath: config.toml
       volumes:
-      - name: config-volume
-        configMap:
-          name: telescope-config
+        - name: config-volume
+          configMap:
+            name: telescope-config

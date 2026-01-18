@@ -4,9 +4,10 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - service.yaml
-  - pvc.yaml
   - configmap.yaml
   - secret.yaml
 
 commonLabels:
+  app.kubernetes.io/name: telescope
+  app.kubernetes.io/component: observability
   managed-by: kustomize
