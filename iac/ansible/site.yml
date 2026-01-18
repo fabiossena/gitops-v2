@@ -3,7 +3,8 @@
   roles:
     - base
 
-- hosts: debian
+- hosts: all
+  become: yes
   roles:
     - role: k3s
       tags: k3s
@@ -11,5 +12,3 @@
       tags: argocd
     - role: k9s
       tags: k9s
-
-#- import_playbook: ansible/playbooks/bootstrap.yml
