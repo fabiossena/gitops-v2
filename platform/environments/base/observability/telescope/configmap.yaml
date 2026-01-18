@@ -10,9 +10,9 @@ data:
 
     [checks]
 
-      [checks.httpbin]
-        [[checks.httpbin.entries]]
-        name = "httpbin-status"
-        url = "https://httpbin.org/status/200"
-        interval = 60
-        timeout = 5
+    [checks.httpbin]
+      [[checks.httpbin.entries]]
+      name = "httpbin-status"
+      url = "https://httpbin.org/status/200"
+      interval = 60
+      timeout = 5

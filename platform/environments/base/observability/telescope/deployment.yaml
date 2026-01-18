@@ -9,12 +9,12 @@ spec:
 
   selector:
     matchLabels:
-      app: telescope   # 🔒 IMUTÁVEL
+      app: telescope
 
   template:
     metadata:
       labels:
-        app: telescope # 🔒 IGUAL AO SELECTOR
+        app: telescope
     spec:
       containers:
       - name: telescope
