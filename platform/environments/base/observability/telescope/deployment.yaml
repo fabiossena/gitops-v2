@@ -25,9 +25,15 @@ spec:
         - secretRef:
             name: telescope-secret
         volumeMounts:
+        - name: telescope-config
+          mountPath: /config.toml
+          subPath: config.toml
         - name: telescope-data
           mountPath: /data
       volumes:
+      - name: telescope-config
+        configMap:
+          name: telescope-config
       - name: telescope-data
         persistentVolumeClaim:
           claimName: telescope-pvc

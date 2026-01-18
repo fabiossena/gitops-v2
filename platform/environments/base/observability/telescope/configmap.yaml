@@ -3,7 +3,9 @@ kind: ConfigMap
 metadata:
   name: telescope-config
 data:
-  TELESCOPE_PORT: "8080"
-  TELESCOPE_CLICKHOUSE_HOST: "clickhouse-service"  # serviço do clickhouse
-  TELESCOPE_CLICKHOUSE_PORT: "9000"
-  TELESCOPE_CLICKHOUSE_DB: "logs"
+  config.toml: |
+    [server]
+    listen = ":8080"
+    host = "clickhouse-service" 
+    port = 9000
+    database = "logs"
