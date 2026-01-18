@@ -17,25 +17,18 @@ spec:
         app: telescope # 🔒 IGUAL AO SELECTOR
     spec:
       containers:
-        - name: telescope
-          image: mozilla/telescope:v6.20.0
+      - name: telescope
+        image: mozilla/telescope:v6.20.0
 
-          ports:
-            - containerPort: 8080
+        ports:
+        - containerPort: 8080
 
-          volumeMounts:
-            - name: telescope-config
-              mountPath: /config.toml
-              subPath: config.toml
-
-            - name: telescope-data
-              mountPath: /data
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/telescope/config.toml
+          subPath: config.toml  # Important for single files
 
       volumes:
-        - name: telescope-config
-          configMap:
-            name: telescope-config
-
-        - name: telescope-data
-          persistentVolumeClaim:
-            claimName: telescope-pvc
+      - name: config-volume
+        configMap:
+          name: telescope-config
