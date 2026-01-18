@@ -4,8 +4,8 @@ kind: Kustomization
 resources:
   - redis
   - postgres
-  # - mysql
-  # - clickhouse
+  - mysql
+  - clickhouse
 
 commonLabels:
   app.kubernetes.io/part-of: database
