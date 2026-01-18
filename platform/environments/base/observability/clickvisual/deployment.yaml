@@ -7,10 +7,15 @@ spec:
   selector:
     matchLabels:
       app: clickvisual
+  
   template:
     metadata:
       labels:
         app: clickvisual
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+
     spec:
       containers:
         - name: clickvisual
