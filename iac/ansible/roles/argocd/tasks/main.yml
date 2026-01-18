@@ -120,7 +120,7 @@
       - app.kubernetes.io/name=argocd-server
   register: argocd_pods
   until: argocd_pods.resources | length > 0 and
-         argocd_pods.resources[0].status.containerStatuses[0].ready
+         (argocd_pods.resources[0].status.containerStatuses[0].ready | default(false))
   retries: 30
   delay: 10
 
