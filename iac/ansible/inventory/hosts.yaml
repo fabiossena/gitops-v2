@@ -1,8 +1,8 @@
 all:
-  hosts:
-    localhost:
-      ansible_connection: local     # roda no WSL localmente
-      ansible_become: yes          # permite usar sudo
-      ansible_become_method: sudo
-      ansible_become_user: root    # ou seu usuário se já for sudo
-      ansible_python_interpreter: /usr/bin/python3  # garante Python correto
+  children:
+    debian:
+      hosts:
+        localhost:
+          ansible_connection: local
+          ansible_become: yes
+          ansible_python_interpreter: /usr/bin/python3
