@@ -5,15 +5,57 @@ metadata:
 data:
   config.xml: |
     <yandex>
-      <logger>
-        <level>information</level>
-        <console>true</console>
-      </logger>
 
-      <path>/var/lib/clickhouse/</path>
-      <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
-      <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
+        <!-- LOGGING -->
+        <logger>
+            <level>information</level>
+            <console>true</console>
+        </logger>
 
-      <http_port>8123</http_port>
-      <tcp_port>9000</tcp_port>
+        <!-- PATHS -->
+        <path>/var/lib/clickhouse/</path>
+        <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
+        <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
+        <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
+
+        <!-- PORTS -->
+        <http_port>8123</http_port>
+        <tcp_port>9000</tcp_port>
+
+        <!-- USERS -->
+        <users>
+            <default>
+                <password></password>
+                <networks>
+                    <ip>::/0</ip>
+                </networks>
+                <profile>default</profile>
+                <quota>default</quota>
+            </default>
+        </users>
+
+        <!-- PROFILES (OBRIGATÓRIO) -->
+        <profiles>
+            <default>
+                <max_memory_usage>10000000000</max_memory_usage>
+                <use_uncompressed_cache>0</use_uncompressed_cache>
+                <load_balancing>random</load_balancing>
+            </default>
+        </profiles>
+
+        <!-- QUOTAS (OBRIGATÓRIO) -->
+        <quotas>
+            <default>
+                <interval>
+                    <duration>3600</duration>
+                    <queries>0</queries>
+                    <errors>0</errors>
+                    <result_rows>0</result_rows>
+                    <read_rows>0</read_rows>
+                    <execution_time>0</execution_time>
+                </interval>
+            </default>
+        </quotas>
+
     </yandex>
+
