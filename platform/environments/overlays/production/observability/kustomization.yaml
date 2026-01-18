@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - ../../../base/observability
 
-# namespace: production-observability # VEM DO APP ARGOCD
+namespace: production-observability # VEM DO APP ARGOCD
 
 # patchesStrategicMerge:
 #   - patch-replicas.yaml

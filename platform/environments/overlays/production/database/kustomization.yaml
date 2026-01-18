@@ -2,9 +2,9 @@
   kind: Kustomization
 
   resources:
-  - ../../../base
+  - ../../../base/database
 
-# namespace: production-database # VEM DO APP ARGOCD
+namespace: production-database # VEM DO APP ARGOCD
 
 # patchesStrategicMerge:
 #   - patch-replicas.yaml
