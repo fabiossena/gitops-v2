@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: clickvisual
-          image: ghcr.io/clickvisual/clickvisual:v1.1.5
+          image: clickvisual/clickvisual:latest
           ports:
             - containerPort: 3000
           envFrom:
