@@ -6,13 +6,12 @@ data:
   config.toml: |
     [checks]
 
-    [checks.database]
+    [checks.clickhouse]
     type = "clickhouse"
     host = "clickhouse"
     port = 8123
     db = "default"
 
-    [checks.application]
+    [checks.application1]
     type = "service"
     endpoint = "http://example-service:8080/health"
-
