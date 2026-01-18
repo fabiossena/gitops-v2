@@ -8,13 +8,6 @@ resources:
   - secret.yaml
   - pvc.yaml
 
-# namespace: telescope
-
-configMapGenerator:
-- name: telescope-config
-  files:
-    - configmap.yaml
-
 secretGenerator:
 - name: telescope-secret
   files:
