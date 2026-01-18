@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: clickvisual
-          image: clickvisual/clickvisual:latest
+          image: ghcr.io/clickvisual/clickvisual:v1.1.5
           ports:
             - containerPort: 3000
           envFrom:
@@ -22,10 +22,9 @@ spec:
                 name: clickvisual-config
             - secretRef:
                 name: clickvisual-secret
-          volumeMounts:
-            - name: clickvisual-data
-              mountPath: /app/data
-      volumes:
-        - name: clickvisual-data
-          persistentVolumeClaim:
-            claimName: clickvisual-pvc
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
