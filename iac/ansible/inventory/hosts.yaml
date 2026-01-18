@@ -1,13 +1,8 @@
 all:
-  children:
-    debian:
-      hosts:
-        # 172.23.161.197:
-        localhost:
-          ansible_connection: local
-          ansible_user: fabiossena
-          ansible_become: no
-          ansible_become_method: sudo
-          ansible_python_interpreter: /usr/bin/python3.13
-          # ansible_python_interpreter pode ser adicionado se Python estiver em caminho não padrão
-          
+  hosts:
+    localhost:
+      ansible_connection: local     # roda no WSL localmente
+      ansible_become: yes          # permite usar sudo
+      ansible_become_method: sudo
+      ansible_become_user: root    # ou seu usuário se já for sudo
+      ansible_python_interpreter: /usr/bin/python3  # garante Python correto
