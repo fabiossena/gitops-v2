@@ -4,7 +4,15 @@ metadata:
   name: telescope-config
 data:
   config.toml: |
-    [database]
+    [checks]
+
+    [checks.database]
+    type = "clickhouse"
     host = "clickhouse"
     port = 8123
     db = "default"
+
+    [checks.application]
+    type = "service"
+    endpoint = "http://example-service:8080/health"
+
