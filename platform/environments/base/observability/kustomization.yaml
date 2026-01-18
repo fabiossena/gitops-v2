@@ -2,11 +2,11 @@
 kind: Kustomization
 
 resources:
-  # - clickvisual
-  # - telescope
+  - clickvisual
+  - telescope
   # - grafana
-  - prometheus
-  - node-exporter
+  # - prometheus
+  # - node-exporter
 
 commonLabels:
   app.kubernetes.io/part-of: observability
