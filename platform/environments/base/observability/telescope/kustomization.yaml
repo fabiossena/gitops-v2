@@ -8,7 +8,7 @@ resources:
   - secret.yaml
   - pvc.yaml
 
-secretGenerator:
-- name: telescope-secret
-  files:
-    - secret.yaml
+# secretGenerator:
+# - name: telescope-secret
+#   files:
+#     - secret.yaml
