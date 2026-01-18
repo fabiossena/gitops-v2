@@ -4,23 +4,16 @@ metadata:
   name: telescope-config
 data:
   config.toml: |
-    [checks]
+    [general]
+    log_level = "info"
+    port = 8080
 
-    [checks.clickhouse]
-    type = "clickhouse"
+    [clickhouse]
     host = "clickhouse"
     port = 8123
-    db = "default"
-    user = "default"
-    password = "password"
+    database = "default"
 
-    [checks.application1]
-    type = "service"
-    endpoint = "http://example-service:8080/health"
-    method = "GET"
-    timeout = 5
-
-    [checks.novo_check]
-    type = "tipo"
-    param1 = "valor1"
-    param2 = "valor2"
+    [checks]
+    example_project = [
+      { name = "check_1", type = "ping", target = "localhost" }
+    ]
