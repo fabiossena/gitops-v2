@@ -4,10 +4,6 @@ metadata:
   name: clickvisual-config
 data:
   default.toml: |
-    [server]
-    host = "0.0.0.0"
-    port = 3000
-
     [mysql]
     dsn = "root:password123@tcp(mysql:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
 

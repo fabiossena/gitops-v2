@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: clickvisual
-          image: clickvisual/clickvisual:latest
+          image: ghcr.io/clickvisual/clickvisual:v1.1.5
           ports:
             - containerPort: 3000
 
@@ -22,13 +22,6 @@ spec:
             - name: config
               mountPath: /clickvisual/config/default.toml
               subPath: default.toml
-
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 30
-            periodSeconds: 10
 
       volumes:
         - name: config
