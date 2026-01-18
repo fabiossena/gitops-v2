@@ -19,32 +19,16 @@ spec:
         ports:
         - containerPort: 9000
         - containerPort: 8123
-
         volumeMounts:
         - name: data
           mountPath: /var/lib/clickhouse
-
         - name: config
           mountPath: /etc/clickhouse-server/config.xml
           subPath: clickhouse-server.xml
-
-        env:
-        - name: CLICKHOUSE_USER
-          valueFrom:
-            secretKeyRef:
-              name: clickhouse-secret
-              key: user
-        - name: CLICKHOUSE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: clickhouse-secret
-              key: password
-
       volumes:
       - name: config
         configMap:
           name: clickhouse-config
-
   volumeClaimTemplates:
   - metadata:
       name: data
