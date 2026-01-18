@@ -4,8 +4,7 @@ metadata:
   name: telescope-config
 data:
   config.toml: |
-    [server]
-    listen = ":8080"
-    host = "clickhouse-service" 
-    port = 9000
-    database = "logs"
+    [database]
+    host = "clickhouse"
+    port = 8123
+    db = "default"

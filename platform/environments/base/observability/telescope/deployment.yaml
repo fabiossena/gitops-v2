@@ -26,7 +26,7 @@ spec:
             name: telescope-secret
         volumeMounts:
         - name: telescope-config
-          mountPath: /config.toml
+          mountPath: /app/config.toml
           subPath: config.toml
         - name: telescope-data
           mountPath: /data
