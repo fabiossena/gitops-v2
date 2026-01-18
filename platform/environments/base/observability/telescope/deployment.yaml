@@ -13,12 +13,16 @@ spec:
       labels:
         app: telescope
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: telescope
           image: ghcr.io/clickvisual/telescope:v1.5.4
           imagePullPolicy: IfNotPresent
 
-          workingDir: /app
+          env:
+            - name: EGO_CONFIG_PATH
+              value: /app/config.toml
 
           volumeMounts:
             - name: config
