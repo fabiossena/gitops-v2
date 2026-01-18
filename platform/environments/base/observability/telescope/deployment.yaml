@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: telescope
-        image: telescope/telescope:latest  # substitua pela tag desejada
+        image: mozilla/telescope:v6.20.0
         ports:
         - containerPort: 8080
         envFrom:
