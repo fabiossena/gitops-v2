@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: telescope
+  namespace: observability-production
 spec:
   replicas: 1
   selector:
@@ -14,17 +15,17 @@ spec:
     spec:
       containers:
         - name: telescope
-          image: mozilla/telescope:v6.20.0
-          ports:
-            - containerPort: 8080
-          envFrom:
-            - secretRef:
-                name: telescope-secret
+          image: ghcr.io/clickvisual/telescope:v1.5.4
+          imagePullPolicy: IfNotPresent
+
+          workingDir: /app
+
           volumeMounts:
-            - name: config-volume
-              mountPath: /config.toml
+            - name: config
+              mountPath: /app/config.toml
               subPath: config.toml
+
       volumes:
-        - name: config-volume
+        - name: config
           configMap:
             name: telescope-config
