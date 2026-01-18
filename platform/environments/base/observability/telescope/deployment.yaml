@@ -20,13 +20,11 @@ spec:
         ports:
         - containerPort: 8080
         envFrom:
-        - configMapRef:
-            name: telescope-config
         - secretRef:
             name: telescope-secret
         volumeMounts:
         - name: telescope-config
-          mountPath: /app/config.toml
+          mountPath: /config.toml
           subPath: config.toml
         - name: telescope-data
           mountPath: /data
