@@ -17,7 +17,7 @@ spec:
         - name: ghcr-secret
       containers:
         - name: telescope
-          image: ghcr.io/clickvisual/telescope:v1.5.4
+          image: clickvisual/clickvisual:latest
           imagePullPolicy: IfNotPresent
 
           env:
