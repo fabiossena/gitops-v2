@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-config
+data:
+  clickhouse-server.xml: |
+    <yandex>
+      <logger>
+        <level>trace</level>
+        <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+      </logger>
+      <http_port>8123</http_port>
+      <tcp_port>9000</tcp_port>
+      <path>/var/lib/clickhouse/</path>
+      <max_connections>1024</max_connections>
+    </yandex>

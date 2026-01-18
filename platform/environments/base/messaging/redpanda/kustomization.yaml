@@ -6,6 +6,7 @@ resources:
 - service.yaml
 - service-client.yaml
 - configmap.yaml
+- pvc.yaml
 - secret.yaml
 
 commonLabels:
@@ -14,10 +15,10 @@ commonLabels:
   managed-by: kustomize
   part-of: platform
 
-secretGenerator:
-- name: redpanda-secret
-  literals:
-  - admin-user=admin
-  - admin-password=senha-segreda
-  - superuser=redpanda
-  - superuser-password=senha-segreda
+# secretGenerator:
+# - name: redpanda-secret
+#   literals:
+#   - admin-user=admin
+#   - admin-password=senha-segreda
+#   - superuser=redpanda
+#   - superuser-password=senha-segreda

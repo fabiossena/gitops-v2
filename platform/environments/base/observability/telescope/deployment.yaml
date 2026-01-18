@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telescope
+  labels:
+    app: telescope
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telescope
+  template:
+    metadata:
+      labels:
+        app: telescope
+    spec:
+      containers:
+      - name: telescope
+        image: telescope/telescope:latest  # substitua pela tag desejada
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: telescope-config
+        - secretRef:
+            name: telescope-secret
+        volumeMounts:
+        - name: telescope-data
+          mountPath: /data
+      volumes:
+      - name: telescope-data
+        persistentVolumeClaim:
+          claimName: telescope-pvc

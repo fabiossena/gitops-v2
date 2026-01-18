@@ -10,14 +10,14 @@ resources:
 
 commonLabels:
   app: mysql
-  component: relational
+  component: database
   managed-by: kustomize
   part-of: platform
 
-secretGenerator:
-- name: mysql-secret
-  literals:
-  - root-password=senha-segreda
-  - username=appuser
-  - password=apppassword
-  - database=appdb
+# secretGenerator:
+# - name: mysql-secret
+#   literals:
+#   - root-password=senha-segreda
+#   - username=appuser
+#   - password=apppassword
+#   - database=appdb

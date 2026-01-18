@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickvisual
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickvisual
+  template:
+    metadata:
+      labels:
+        app: clickvisual
+    spec:
+      containers:
+        - name: clickvisual
+          image: axiomhq/clickvisual:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: clickvisual-config
+            - secretRef:
+                name: clickvisual-secret
+          volumeMounts:
+            - name: clickvisual-data
+              mountPath: /app/data
+      volumes:
+        - name: clickvisual-data
+          persistentVolumeClaim:
+            claimName: clickvisual-pvc

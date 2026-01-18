@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: telescope
+spec:
+  selector:
+    app: telescope
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8090
+  type: ClusterIP
