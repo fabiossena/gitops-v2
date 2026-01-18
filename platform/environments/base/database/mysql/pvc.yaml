@@ -4,7 +4,7 @@ metadata:
   name: mysql-pvc
   labels:
     app: mysql
-    component: relational
+    component: database
 spec:
   accessModes:
   - ReadWriteOnce

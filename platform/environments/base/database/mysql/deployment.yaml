@@ -4,7 +4,7 @@ metadata:
   name: mysql
   labels:
     app: mysql
-    component: relational
+    component: database
 spec:
   replicas: 1
   selector:
@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: mysql
-        component: relational
+        component: database
     spec:
       containers:
       - name: mysql
