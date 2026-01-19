@@ -4,14 +4,14 @@ metadata:
   name: clickvisual-config
 data:
   default.toml: |
-    [app]
-    secretKey = "secretKey" # hashStatecode
-    rootURL = "http://clickvisual.production-observability.svc.cluster.local"
-    baseURL = "/api/admin/login/"
-    permissionFile = './config/resource.yaml'
+    # [app]
+    # secretKey = "secretKey" # hashStatecode
+    # rootURL = "http://clickvisual.production-observability.svc.cluster.local"
+    # baseURL = "/api/admin/login/"
+    # permissionFile = './config/resource.yaml'
 
-    [casbin.rule]
-    path = "./config/rbac.conf"
+    # [casbin.rule]
+    # path = "./config/rbac.conf"
 
     [server]
     port = 3001
