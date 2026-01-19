@@ -2,10 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: clickvisual-config
+# dsn = "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
 data:
   default.toml: |
     [mysql]
-    dsn = "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
+    dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
 
     [clickhouse]
     host = "clickhouse"
