@@ -2,10 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: clickvisual
+  namespace: production-observability
 spec:
   selector:
     app: clickvisual
   ports:
     - port: 80
-      targetPort: 3001
+      targetPort: 3000
   type: ClusterIP

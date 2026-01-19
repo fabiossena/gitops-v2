@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: clickvisual
+  namespace: production-observability
 spec:
   replicas: 1
   selector:
@@ -19,17 +20,32 @@ spec:
           image: clickvisual/clickvisual:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
-
-          envFrom:
-            - secretRef:
-                name: clickvisual-secret
-
+            - containerPort: 3001
+          env:
+            - name: EGO_CONFIG_PATH
+              value: "/clickvisual/config/default.toml"
           volumeMounts:
             - name: config
-              mountPath: /clickvisual/config/default.toml
-              subPath: default.toml
-
+              mountPath: /clickvisual/config
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
       volumes:
         - name: config
           configMap:
