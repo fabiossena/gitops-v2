@@ -6,6 +6,7 @@ kind: Kustomization
 resources:
   - clickvisual
   - telescope
+  - kafdrop
   # - grafana
   # - prometheus
   # - node-exporter

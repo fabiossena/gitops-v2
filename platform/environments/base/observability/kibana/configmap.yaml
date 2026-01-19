@@ -4,7 +4,7 @@ metadata:
   name: kibana-config
   labels:
     app: kibana
-    component: search
+    component: observability
 data:
   kibana.yml: |
     server.name: kibana
