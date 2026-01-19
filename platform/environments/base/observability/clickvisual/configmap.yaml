@@ -7,7 +7,6 @@ data:
   default.toml: |
     [server]
     port = 8089
-    http = 3001
     
     [mysql]
     dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
