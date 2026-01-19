@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redpanda
-  namespace: production-messaging
 spec:
   serviceName: "redpanda"
   replicas: 1
@@ -21,37 +20,27 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            # Create configuration
-            cat > /etc/redpanda/redpanda.yaml << 'EOF'
-            redpanda:
-              data_directory: /var/lib/redpanda/data
-              node_id: 0
-              seed_servers: []
-              rpc_server:
-                address: 0.0.0.0
-                port: 33145
-              kafka_api:
-                - address: 0.0.0.0
-                  port: 9092
-                  name: PLAINTEXT
-              admin:
-                - address: 0.0.0.0
-                  port: 9644
-              advertised_kafka_api:
-                - address: 0.0.0.0  # Will be accessible via service
-                  port: 9092
-                  name: PLAINTEXT
-              auto_create_topics_enabled: true
-              developer_mode: true
+            # Configuração mínima inline
+            cat > /tmp/redpanda.yaml << 'EOF'
+            node_id: 0
+            data_directory: /var/lib/redpanda/data
+            developer_mode: true
             EOF
             
-            # Start Redpanda
+            # Iniciar Redpanda com flags que forçam bind externo
             exec rpk redpanda start \
-              --config /etc/redpanda/redpanda.yaml \
+              --config /tmp/redpanda.yaml \
               --smp 1 \
               --memory 2G \
               --overprovisioned \
-              --check=false
+              --check=false \
+              --kafka-addr PLAINTEXT://0.0.0.0:9092 \
+              --advertise-kafka-addr PLAINTEXT://$(hostname).redpanda.production-messaging.svc.cluster.local:9092 \
+              --rpc-addr 0.0.0.0:33145 \
+              --advertise-rpc-addr $(hostname).redpanda.production-messaging.svc.cluster.local:33145
+        env:
+        - name: ALLOW_PLAINTEXT_LISTENER
+          value: "yes"
         ports:
         - containerPort: 9092
           name: kafka
@@ -61,11 +50,11 @@ spec:
           name: admin
         resources:
           requests:
-            memory: "2Gi"
+            memory: "3Gi"
             cpu: "500m"
           limits:
-            memory: "3Gi"
-            cpu: "1"
+            memory: "4Gi"
+            cpu: "2"
         volumeMounts:
         - name: data
           mountPath: /var/lib/redpanda/data
@@ -98,4 +87,4 @@ spec:
       resources:
         requests:
           storage: 20Gi
-      storageClassName: local-path  # Add this!
+      storageClassName: local-path
