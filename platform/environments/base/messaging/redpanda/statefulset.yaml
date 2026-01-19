@@ -2,9 +2,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redpanda
+  namespace: production-messaging
 spec:
   serviceName: "redpanda"
   replicas: 1
+  podManagementPolicy: Parallel  # Important for Redpanda cluster formation
   selector:
     matchLabels:
       app: redpanda
@@ -13,28 +15,75 @@ spec:
       labels:
         app: redpanda
     spec:
+      terminationGracePeriodSeconds: 120  # Redpanda needs time to shut down
       containers:
       - name: redpanda
         image: redpandadata/redpanda:latest-fips
+        command: ["/bin/sh", "-c"]
         args:
-          - start
-          - --overprovisioned
-          - --smp 1
-          - --memory 2G
-          - --reserve-memory 1G
-          - --kafka-addr PLAINTEXT://0.0.0.0:9092
+          - |
+            # Extract node ID from pod name
+            NODE_ID=$(echo ${POD_NAME} | sed 's/redpanda-//')
+            # Generate config with proper node ID
+            envsubst < /etc/redpanda/redpanda.yaml.template > /etc/redpanda/redpanda.yaml
+            # Start Redpanda
+            exec rpk redpanda start \
+              --config /etc/redpanda/redpanda.yaml \
+              --overprovisioned \
+              --smp 1 \
+              --memory 2G \
+              --reserve-memory 1G
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: REDPANDA_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         ports:
         - containerPort: 9092
+          name: kafka
+        - containerPort: 33145
+          name: rpc
+        - containerPort: 9644
+          name: admin
+        resources:
+          requests:
+            memory: "3Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
         volumeMounts:
         - name: data
           mountPath: /var/lib/redpanda/data
         - name: config
-          mountPath: /etc/redpanda/redpanda.yaml
+          mountPath: /etc/redpanda/redpanda.yaml.template
           subPath: redpanda.yaml
+          readOnly: true
+        readinessProbe:
+          tcpSocket:
+            port: 9092
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 9092
+          initialDelaySeconds: 20
+          periodSeconds: 10
       volumes:
       - name: config
         configMap:
           name: redpanda-config
+          items:
+          - key: redpanda.yaml
+            path: redpanda.yaml
   volumeClaimTemplates:
   - metadata:
       name: data
