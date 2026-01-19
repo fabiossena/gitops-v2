@@ -38,11 +38,11 @@ data:
     maxIdleConns = 50
     maxOpenConns = 100
 
-    # [auth]
-    # mode = "memstore"
-    # name = "clickvisual_session"
-    # debug = true
-    # Keypairs = "secret"
+    [auth]
+    mode = "memstore"
+    name = "clickvisual_session"
+    debug = true
+    Keypairs = "secret"
     # if use mode redis
     # redisSize = 10
     # redisNetwork = "tcp"
