@@ -7,7 +7,7 @@ resources:
 - service-client.yaml
 - configmap.yaml
 - pvc.yaml
-#- secret.yaml  # Comente se não está usando SASL/TLS ainda
+- secret.yaml
 
 commonLabels:
   app: redpanda

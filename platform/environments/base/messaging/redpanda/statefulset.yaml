@@ -2,9 +2,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redpanda
+  namespace: production-messaging
 spec:
   serviceName: "redpanda"
   replicas: 1
+  podManagementPolicy: Parallel  # Important for Redpanda cluster formation
   selector:
     matchLabels:
       app: redpanda
@@ -13,28 +15,37 @@ spec:
       labels:
         app: redpanda
     spec:
-      terminationGracePeriodSeconds: 120
+      terminationGracePeriodSeconds: 120  # Redpanda needs time to shut down
       containers:
       - name: redpanda
         image: redpandadata/redpanda:latest-fips
-        command: ["/bin/bash", "-c"]
+        command: ["/bin/sh", "-c"]
         args:
           - |
-            # Mostrar configuração
-            echo "=== Configuração ==="
-            cat /etc/redpanda/redpanda.yaml
-            
-            # Usar rpk redpanda start (NÃO container start)
-            echo "=== Iniciando Redpanda ==="
+            # Extract node ID from pod name
+            NODE_ID=$(echo ${POD_NAME} | sed 's/redpanda-//')
+            # Generate config with proper node ID
+            envsubst < /etc/redpanda/redpanda.yaml.template > /etc/redpanda/redpanda.yaml
+            # Start Redpanda
             exec rpk redpanda start \
               --config /etc/redpanda/redpanda.yaml \
               --overprovisioned \
-              --check=false
+              --smp 1 \
+              --memory 2G \
+              --reserve-memory 1G
         env:
-        - name: ALLOW_PLAINTEXT_LISTENER
-          value: "yes"
-        - name: REDPANDA_ENVIRONMENT
-          value: "kubernetes"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: REDPANDA_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         ports:
         - containerPort: 9092
           name: kafka
@@ -44,38 +55,27 @@ spec:
           name: admin
         resources:
           requests:
-            memory: "2Gi"
+            memory: "3Gi"
             cpu: "500m"
           limits:
-            memory: "3Gi"
-            cpu: "1"
+            memory: "4Gi"
+            cpu: "2"
         volumeMounts:
         - name: data
           mountPath: /var/lib/redpanda/data
         - name: config
-          mountPath: /etc/redpanda/redpanda.yaml
+          mountPath: /etc/redpanda/redpanda.yaml.template
           subPath: redpanda.yaml
           readOnly: true
-        # Probes mais tolerantes
-        startupProbe:
-          tcpSocket:
-            port: 9092
-          failureThreshold: 30
-          periodSeconds: 10
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - |
-              # Verifica se Redpanda responde no admin API
-              curl -f http://localhost:9644/v1/status/ready >/dev/null 2>&1 || exit 1
-          initialDelaySeconds: 60
-          periodSeconds: 20
         readinessProbe:
           tcpSocket:
             port: 9092
-          initialDelaySeconds: 30
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 9092
+          initialDelaySeconds: 20
           periodSeconds: 10
       volumes:
       - name: config
