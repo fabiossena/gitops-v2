@@ -16,11 +16,12 @@ data:
     path = "./config/rbac.conf"
 
     # Configurações do Servidor HTTP
-    [server]
-    port = 3001
+    # [server]
+    # port = 3001
 
     [server.http]
     host = "0.0.0.0"
+    port = 3001
     embedPath = "dist"
     maxAge = 86400
 
