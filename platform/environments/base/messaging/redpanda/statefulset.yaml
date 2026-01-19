@@ -16,7 +16,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
       - name: redpanda
-        image: redpandadata/redpanda:v23.3.1-fips  # Use versão específica, não latest
+        image: redpandadata/redpanda:latest-fips
         command: ["/bin/bash", "-c"]
         args:
           - |
