@@ -9,7 +9,7 @@ data:
     secretKey = "secretKey" # hashStatecode - ALTERAR EM PRODUÇÃO
     rootURL = "http://clickvisual.production-observability.svc.cluster.local"
     baseURL = "/api/admin/login/"
-    permissionFile = './config/resource.yaml'
+    # permissionFile = './config/resource.yaml'
 
     # Configurações de Autorização
     [casbin.rule]
