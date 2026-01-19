@@ -2,14 +2,32 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redpanda-config
+  namespace: production-messaging
 data:
   redpanda.yaml: |
-    node_id: 0
+    # This will be overridden by environment variables
+    node_id: ${REDPANDA_NODE_ID}
     data_directory: /var/lib/redpanda/data
     kafka_api:
+      - address: 0.0.0.0
+        port: 9092
+    admin:
+      - address: 0.0.0.0
+        port: 9644
+    rpc_server:
       address: 0.0.0.0
-      port: 9092
-    replication_factor: 3
+      port: 33145
+    advertised_rpc_api:
+      address: ${POD_NAME}.redpanda.production-messaging.svc.cluster.local
+      port: 33145
+    advertised_kafka_api:
+      - address: ${POD_NAME}.redpanda.production-messaging.svc.cluster.local
+        port: 9092
     seed_servers:
-      - host: redpanda-0.redpanda.logging.svc.cluster.local
-        port: 33145
+      - host:
+          address: redpanda-0.redpanda.production-messaging.svc.cluster.local
+          port: 33145
+    # Start with replication factor 1 for 2-node cluster
+    redpanda:
+      empty_seed_starts_cluster: false
+      enable_leader_balancer: true
