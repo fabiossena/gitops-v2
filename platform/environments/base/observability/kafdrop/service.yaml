@@ -1,12 +1,13 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: kafdrop
-spec:
-  type: ClusterIP
-  ports:
-  - port: 9000
-    targetPort: 9000
-    name: http
-  selector:
-    app: kafdrop
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: kafdrop
+  spec:
+    type: ClusterIP
+    ports:
+    - port: 9000
+      targetPort: 9000
+      nodePort: 30000
+      name: http
+    selector:
+      app: kafdrop
