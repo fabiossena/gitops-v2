@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
       - name: redpanda
-        image: docker.redpanda.com/redpandadata/redpanda:v24.2.1  # Use official image
+        image: redpandadata/redpanda:latest-fips
         command: ["/bin/bash", "-c"]
         args:
           - |
