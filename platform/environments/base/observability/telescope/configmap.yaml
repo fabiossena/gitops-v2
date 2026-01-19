@@ -14,3 +14,8 @@ data:
 
     [mysql]
     dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local&tls=false&allowNativePasswords=true"
+    
+    [auth]
+    enabled = false
+    jwt_secret = "change-me-in-production-please"
+    token_ttl = 86400
