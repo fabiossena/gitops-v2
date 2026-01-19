@@ -2,12 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: clickvisual-config
-# dsn = "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
 data:
   default.toml: |
     [app]
     secretKey = "secretKey" # hashStatecode
-    rootURL = "http://localhost:19001"
+    rootURL = "http://clickvisual.production-observability.svc.cluster.local:19001"  # Ajustado para o serviço interno
     baseURL = "/api/admin/login/"
     permissionFile = './config/resource.yaml'
 
@@ -31,7 +30,7 @@ data:
     [mysql]
     connMaxLifetime = "300s"
     debug = true
-    dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local&readTimeout=1s&timeout=1s&writeTimeout=3s"
+    dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local&readTimeout=1s&timeout=1s&writeTimeout=3s&tls=false&allowNativePasswords=true"
     level = "panic"
     maxIdleConns = 50
     maxOpenConns = 100
@@ -41,11 +40,6 @@ data:
     name = "clickvisual_session"
     debug = true
     Keypairs = "secret"
-    # if use mode redis
-    # redisSize = 10
-    # redisNetwork = "tcp"
-    # redisAddr = ""
-    # redisPassword = ""
 
     [auth.anonymous]
     # enable anonymous access
@@ -59,46 +53,15 @@ data:
     rootTokenKey = "X-CLICKVISUAL-TOKEN"
     rootTokenValue = "xxx"
 
-    [[auth.tps]]
-    typ = "github"
-    enable = true
-    allowSignUp = true
-    clientId = ""
-    clientSecret = ""
-    scopes = ["user:email", "read:org"]
-    authUrl = "https://github.com/login/oauth/authorize"
-    tokenUrl = "https://github.com/login/oauth/access_token"
-    apiUrl = "https://api.github.com/user"
-    allowedDomains = []
-    teamIds = []
-    allowedOrganizations = []
-
-    [[auth.tps]]
-    typ = "gitlab"
-    enable = true
-    allowSignUp = true
-    clientId = ""
-    clientSecret = ""
-    scopes = ["api"]
-    authUrl = "https://gitlab.com/oauth/authorize"
-    tokenUrl = "https://gitlab.com/oauth/token"
-    apiUrl = "https://gitlab.com/api/v4"
-    allowedDomains = []
-    teamIds = []
-    allowedOrganizations = []
+    # Removendo os [[auth.tps]] para simplificar. Se necessário, adicione depois.
 
     [prom2click]
-    enable = true
-
-    [[prom2click.cfgs]]
-    host = "127.0.0.1"
-    port = 19006
-    clickhouseDSN = "tcp://clickhouse:9000?username=root&password=shimo&read_timeout=10&write_timeout=10&debug=true"
-    clickhouseDB = "metrics"
-    clickhouseTable = "samples"
+    enable = false  # Desabilitado inicialmente para simplificar
 
     [defaultCh]
-    dsn="clickhouse://root:shimo@clickhouse:9000/default?max_execution_time=60"
+    dsn="clickhouse://root:@clickhouse:9000/default?max_execution_time=60"  # Ajuste a senha se necessário
 
-    
-
+    [clickhouse]
+    host = "clickhouse"
+    port = 9000  # Usando a porta TCP nativa, mas pode ser 8123 para HTTP. Ajuste conforme necessário.
+    database = "default"
