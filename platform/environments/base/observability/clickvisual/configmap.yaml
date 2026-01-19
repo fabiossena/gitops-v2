@@ -22,9 +22,9 @@ data:
     embedPath = "dist"
     maxAge = 86400
 
-    [server.governor]
-    host = "0.0.0.0"
-    port = 19011
+    # [server.governor]
+    # host = "0.0.0.0"
+    # port = 19011
 
     [logger]
     level = "debug"
@@ -38,11 +38,11 @@ data:
     maxIdleConns = 50
     maxOpenConns = 100
 
-    [auth]
-    mode = "memstore"
-    name = "clickvisual_session"
-    debug = true
-    Keypairs = "secret"
+    # [auth]
+    # mode = "memstore"
+    # name = "clickvisual_session"
+    # debug = true
+    # Keypairs = "secret"
     # if use mode redis
     # redisSize = 10
     # redisNetwork = "tcp"
