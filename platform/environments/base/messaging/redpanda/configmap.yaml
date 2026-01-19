@@ -30,4 +30,4 @@ data:
     developer_mode: true
     
     # Log configuration
-    log_segment_size: 268435456
+    log_segment_size: 268435456 
