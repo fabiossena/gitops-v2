@@ -5,13 +5,12 @@ metadata:
 # dsn = "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
 data:
   default.toml: |
-    [server]
-    port = 3001
-
-    [mysql]
-    dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local&tls=false&allowNativePasswords=true"
-
+    port = 8089
+    
+    [db]
+    type = "mysql"
+    dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
+    
     [clickhouse]
-    host = "clickhouse"
-    port = 8123
+    address = "clickhouse:8123"
     database = "default"
