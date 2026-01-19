@@ -4,32 +4,36 @@ metadata:
   name: clickvisual-config
 data:
   default.toml: |
-    # [app]
-    # secretKey = "secretKey" # hashStatecode
-    # rootURL = "http://clickvisual.production-observability.svc.cluster.local"
-    # baseURL = "/api/admin/login/"
-    # permissionFile = './config/resource.yaml'
+    # Configurações da Aplicação
+    [app]
+    secretKey = "secretKey" # hashStatecode - ALTERAR EM PRODUÇÃO
+    rootURL = "http://clickvisual.production-observability.svc.cluster.local"
+    baseURL = "/api/admin/login/"
+    permissionFile = './config/resource.yaml'
 
-    # [casbin.rule]
-    # path = "./config/rbac.conf"
+    # Configurações de Autorização
+    [casbin.rule]
+    path = "./config/rbac.conf"
 
+    # Configurações do Servidor HTTP
     [server]
     port = 3001
 
     [server.http]
     host = "0.0.0.0"
-    port = 3001
     embedPath = "dist"
     maxAge = 86400
 
-    # [server.governor]
-    # host = "0.0.0.0"
-    # port = 19011
+    [server.governor]
+    host = "0.0.0.0"
+    port = 19011
 
+    # Configurações de Log
     [logger]
     level = "debug"
     name = "clickvisual.log"
 
+    # Configurações do MySQL
     [mysql]
     connMaxLifetime = "300s"
     debug = true
@@ -38,72 +42,77 @@ data:
     maxIdleConns = 50
     maxOpenConns = 100
 
+    # Configurações de Autenticação
     [auth]
-    mode = "memstore"
+    mode = "memstore" # redis ou memstore
     name = "clickvisual_session"
     debug = true
-    Keypairs = "secret"
-    # if use mode redis
+    Keypairs = "secret-change-this-in-production"
+    # Se usar modo redis, descomente abaixo:
     # redisSize = 10
     # redisNetwork = "tcp"
     # redisAddr = ""
     # redisPassword = ""
 
-    # [auth.anonymous]
-    # enabled = false
+    [auth.anonymous]
+    enabled = false
 
-    # [auth.proxy]
-    # enabled = false
-    # isAutoLogin = false
-    # headerName = "X-CLICKVISUAL-USER"
-    # headerNickName = "X-CLICKVISUAL-NICKNAME"
-    # rootTokenKey = "X-CLICKVISUAL-TOKEN"
-    # rootTokenValue = "xxx"
+    [auth.proxy]
+    enabled = false
+    isAutoLogin = false
+    headerName = "X-CLICKVISUAL-USER"
+    headerNickName = "X-CLICKVISUAL-NICKNAME"
+    rootTokenKey = "X-CLICKVISUAL-TOKEN"
+    rootTokenValue = "xxx"
 
-    # [[auth.tps]]
-    # typ = "github"
-    # enable = false
-    # allowSignUp = true
-    # clientId = ""
-    # clientSecret = ""
-    # scopes = ["user:email", "read:org"]
-    # authUrl = "https://github.com/login/oauth/authorize"
-    # tokenUrl = "https://github.com/login/oauth/access_token"
-    # apiUrl = "https://api.github.com/user"
-    # allowedDomains = []
-    # teamIds = []
-    # allowedOrganizations = []
+    # Configurações OAuth (desabilitadas por padrão)
+    [[auth.tps]]
+    typ = "github"
+    enable = false
+    allowSignUp = true
+    clientId = ""
+    clientSecret = ""
+    scopes = ["user:email", "read:org"]
+    authUrl = "https://github.com/login/oauth/authorize"
+    tokenUrl = "https://github.com/login/oauth/access_token"
+    apiUrl = "https://api.github.com/user"
+    allowedDomains = []
+    teamIds = []
+    allowedOrganizations = []
 
-    # [[auth.tps]]
-    # typ = "gitlab"
-    # enable = false
-    # allowSignUp = true
-    # clientId = ""
-    # clientSecret = ""
-    # scopes = ["api"]
-    # authUrl = "https://gitlab.com/oauth/authorize"
-    # tokenUrl = "https://gitlab.com/oauth/token"
-    # apiUrl = "https://gitlab.com/api/v4"
-    # allowedDomains = []
-    # teamIds = []
-    # allowedOrganizations = []
+    [[auth.tps]]
+    typ = "gitlab"
+    enable = false
+    allowSignUp = true
+    clientId = ""
+    clientSecret = ""
+    scopes = ["api"]
+    authUrl = "https://gitlab.com/oauth/authorize"
+    tokenUrl = "https://gitlab.com/oauth/token"
+    apiUrl = "https://gitlab.com/api/v4"
+    allowedDomains = []
+    teamIds = []
+    allowedOrganizations = []
 
-    # [prom2click]
-    # enable = false
+    # Integração Prometheus para ClickHouse (desabilitada)
+    [prom2click]
+    enable = false
 
-    # [[prom2click.cfgs]]
-    # host = "0.0.0.0"
-    # port = 19006
-    # clickhouseDSN = "tcp://clickhouse:9000?username=default&read_timeout=10&write_timeout=10&debug=true"
-    # clickhouseDB = "metrics"
-    # clickhouseTable = "samples"
+    [[prom2click.cfgs]]
+    host = "0.0.0.0"
+    port = 19006
+    clickhouseDSN = "tcp://clickhouse:9000?username=default&read_timeout=10&write_timeout=10&debug=true"
+    clickhouseDB = "metrics"
+    clickhouseTable = "samples"
 
+    # Configurações do ClickHouse
     [clickhouse]
     host = "clickhouse"
     port = 8123
     database = "default"
-    username = "clickhouse"
-    password = "password"
+    username = "default"  # Usuário padrão do ClickHouse
+    password = ""  # Senha vazia para o usuário default
 
-    # [defaultCh]
-    # dsn = "clickhouse://default:@clickhouse:8123/default?max_execution_time=60"
+    # Conexão padrão do ClickHouse para queries
+    [defaultCh]
+    dsn = "clickhouse://default:@clickhouse:8123/default?max_execution_time=60"
