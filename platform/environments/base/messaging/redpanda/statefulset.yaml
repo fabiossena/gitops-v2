@@ -2,9 +2,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redpanda
+  namespace: production-messaging
 spec:
   serviceName: "redpanda"
   replicas: 1
+  podManagementPolicy: Parallel  # Important for Redpanda cluster formation
   selector:
     matchLabels:
       app: redpanda
@@ -13,10 +15,13 @@ spec:
       labels:
         app: redpanda
     spec:
-      terminationGracePeriodSeconds: 120
+      terminationGracePeriodSeconds: 120  # Redpanda needs time to shut down
       containers:
       - name: redpanda
         image: redpandadata/redpanda:latest-fips
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
         command: ["/bin/bash", "-c"]
         args:
           - |
@@ -32,6 +37,14 @@ spec:
               --node-id ${NODE_ID} \
               --check=false  # Add this flag
         env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: REDPANDA_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         - name: HOSTNAME
           valueFrom:
             fieldRef:
@@ -57,24 +70,16 @@ spec:
           mountPath: /etc/redpanda/redpanda.yaml.template
           subPath: redpanda.yaml
           readOnly: true
-        # Add a startup probe to ensure Redpanda is ready
-        startupProbe:
-          tcpSocket:
-            port: 9092
-          failureThreshold: 30
-          periodSeconds: 10
         readinessProbe:
           tcpSocket:
             port: 9092
-          initialDelaySeconds: 30
+          initialDelaySeconds: 10
           periodSeconds: 5
-          timeoutSeconds: 5
         livenessProbe:
           tcpSocket:
             port: 9092
-          initialDelaySeconds: 45
+          initialDelaySeconds: 20
           periodSeconds: 10
-          timeoutSeconds: 5
       volumes:
       - name: config
         configMap:
