@@ -17,7 +17,7 @@ spec:
         image: obsidiandynamics/kafdrop:4.0.1  # Use versão específica
         env:
         - name: KAFKA_BROKERCONNECT
-          value: "redpanda.production-messaging.svc.cluster.local:9092"
+          value: "redpanda-0.redpanda.production-messaging.svc.cluster.local:9092 "
         - name: SERVER_PORT
           value: "9000"
         - name: JVM_OPTS
