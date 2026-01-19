@@ -31,6 +31,10 @@ spec:
         - name: config
           mountPath: /etc/redpanda/redpanda.yaml
           subPath: redpanda.yaml
+      volumes:
+      - name: config
+        configMap:
+          name: redpanda-config
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -39,7 +43,3 @@ spec:
       resources:
         requests:
           storage: 20Gi
-  volumes:
-    - name: config
-      configMap:
-        name: redpanda-config
