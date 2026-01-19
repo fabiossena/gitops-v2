@@ -9,11 +9,11 @@ data:
     secretKey = "secretKey" # hashStatecode - ALTERAR EM PRODUÇÃO
     rootURL = "http://clickvisual.production-observability.svc.cluster.local"
     baseURL = "/api/admin/login/"
-    # permissionFile = './config/resource.yaml'
+    permissionFile = "/clickvisual/config/resource.yaml"
 
     # Configurações de Autorização
     [casbin.rule]
-    path = "./config/rbac.conf"
+    path = "/clickvisual/config/rbac.conf"
 
     # Configurações do Servidor HTTP
     # [server]
@@ -22,7 +22,7 @@ data:
     [server.http]
     host = "0.0.0.0"
     port = 3001
-    embedPath = "dist"
+    # embedPath = "dist"
     maxAge = 86400
 
     [server.governor]
