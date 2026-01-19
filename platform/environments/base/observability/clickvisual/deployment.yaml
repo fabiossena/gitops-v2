@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: clickvisual
-  namespace: production-observability
 spec:
   replicas: 1
   selector:
@@ -26,27 +25,13 @@ spec:
               value: "/clickvisual/config/default.toml"
           volumeMounts:
             - name: config
-              mountPath: /clickvisual/config
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "250m"
-            limits:
-              memory: "1Gi"
-              cpu: "500m"
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 3001
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 3001
-            initialDelaySeconds: 30
-            periodSeconds: 10
+              mountPath: /clickvisual/config/default.toml  # Montar como arquivo
+              subPath: default.toml
+              readOnly: true
       volumes:
         - name: config
           configMap:
             name: clickvisual-config
+            items:
+            - key: default.toml
+              path: default.toml
