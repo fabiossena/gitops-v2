@@ -7,18 +7,10 @@ resources:
 - service-client.yaml
 - configmap.yaml
 - pvc.yaml
-- secret.yaml
+#- secret.yaml  # Comente se não está usando SASL/TLS ainda
 
 commonLabels:
   app: redpanda
   component: messaging
   managed-by: kustomize
   part-of: platform
-
-# secretGenerator:
-# - name: redpanda-secret
-#   literals:
-#   - admin-user=admin
-#   - admin-password=senha-segreda
-#   - superuser=redpanda
-#   - superuser-password=senha-segreda
