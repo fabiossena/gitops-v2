@@ -6,7 +6,7 @@ metadata:
 data:
   default.toml: |
     [server]
-    http = ''
+    http = '0.0.0.0'
     port = 8089
     
     [mysql]
