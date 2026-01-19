@@ -19,9 +19,6 @@ spec:
       containers:
       - name: redpanda
         image: redpandadata/redpanda:latest-fips
-        command: ["/bin/sh", "-c"]
-        args:
-          - |
         command: ["/bin/bash", "-c"]
         args:
           - |
