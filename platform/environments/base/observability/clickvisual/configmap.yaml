@@ -36,11 +36,11 @@ data:
     # Configurações do MySQL
     [mysql]
     connMaxLifetime = "300s"
-    debug = true
-    dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local&readTimeout=1s&timeout=1s&writeTimeout=3s&tls=false&allowNativePasswords=true"
-    level = "panic"
-    maxIdleConns = 50
-    maxOpenConns = 100
+    debug = false  # Changed from true to false
+    dsn = "root:root123@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local&timeout=10s"
+    level = "error"  # Changed from panic to error
+    maxIdleConns = 10  # Reduced from 50
+    maxOpenConns = 20  # Reduced from 100
 
     # Configurações de Autenticação
     [auth]
