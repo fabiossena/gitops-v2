@@ -1,20 +1,25 @@
-# Minimal ConfigMap
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redpanda-config
 data:
   redpanda.yaml: |
-    node_id: 0
-    data_directory: /var/lib/redpanda/data
-    kafka_api:
-      - address: 0.0.0.0
-        port: 9092
-    admin_api:
-      - address: 0.0.0.0
-        port: 9644
-    rpc_server:
-      address: 0.0.0.0
-      port: 33145
-    seed_servers: []
-    developer_mode: true
+    # Configuração mínima e testada
+    redpanda:
+      data_directory: /var/lib/redpanda/data
+      node_id: 0
+      kafka_api:
+        - address: 0.0.0.0
+          port: 9092
+          authentication_method: null
+      admin_api:
+        - address: 0.0.0.0
+          port: 9644
+          authentication_method: null
+      rpc_server:
+        address: 0.0.0.0
+        port: 33145
+      seed_servers: []
+      developer_mode: true
+    pandaproxy: {}
+    schema_registry: {}
