@@ -15,7 +15,7 @@ data:
 
     [server]
     port = 3001
-    
+
     [server.http]
     host = "0.0.0.0"
     port = 3001
@@ -52,51 +52,51 @@ data:
     [auth.anonymous]
     enabled = false
 
-    [auth.proxy]
-    enabled = false
-    isAutoLogin = false
-    headerName = "X-CLICKVISUAL-USER"
-    headerNickName = "X-CLICKVISUAL-NICKNAME"
-    rootTokenKey = "X-CLICKVISUAL-TOKEN"
-    rootTokenValue = "xxx"
+    # [auth.proxy]
+    # enabled = false
+    # isAutoLogin = false
+    # headerName = "X-CLICKVISUAL-USER"
+    # headerNickName = "X-CLICKVISUAL-NICKNAME"
+    # rootTokenKey = "X-CLICKVISUAL-TOKEN"
+    # rootTokenValue = "xxx"
 
-    [[auth.tps]]
-    typ = "github"
-    enable = false
-    allowSignUp = true
-    clientId = ""
-    clientSecret = ""
-    scopes = ["user:email", "read:org"]
-    authUrl = "https://github.com/login/oauth/authorize"
-    tokenUrl = "https://github.com/login/oauth/access_token"
-    apiUrl = "https://api.github.com/user"
-    allowedDomains = []
-    teamIds = []
-    allowedOrganizations = []
+    # [[auth.tps]]
+    # typ = "github"
+    # enable = false
+    # allowSignUp = true
+    # clientId = ""
+    # clientSecret = ""
+    # scopes = ["user:email", "read:org"]
+    # authUrl = "https://github.com/login/oauth/authorize"
+    # tokenUrl = "https://github.com/login/oauth/access_token"
+    # apiUrl = "https://api.github.com/user"
+    # allowedDomains = []
+    # teamIds = []
+    # allowedOrganizations = []
 
-    [[auth.tps]]
-    typ = "gitlab"
-    enable = false
-    allowSignUp = true
-    clientId = ""
-    clientSecret = ""
-    scopes = ["api"]
-    authUrl = "https://gitlab.com/oauth/authorize"
-    tokenUrl = "https://gitlab.com/oauth/token"
-    apiUrl = "https://gitlab.com/api/v4"
-    allowedDomains = []
-    teamIds = []
-    allowedOrganizations = []
+    # [[auth.tps]]
+    # typ = "gitlab"
+    # enable = false
+    # allowSignUp = true
+    # clientId = ""
+    # clientSecret = ""
+    # scopes = ["api"]
+    # authUrl = "https://gitlab.com/oauth/authorize"
+    # tokenUrl = "https://gitlab.com/oauth/token"
+    # apiUrl = "https://gitlab.com/api/v4"
+    # allowedDomains = []
+    # teamIds = []
+    # allowedOrganizations = []
 
-    [prom2click]
-    enable = false
+    # [prom2click]
+    # enable = false
 
-    [[prom2click.cfgs]]
-    host = "0.0.0.0"
-    port = 19006
-    clickhouseDSN = "tcp://clickhouse:9000?username=default&read_timeout=10&write_timeout=10&debug=true"
-    clickhouseDB = "metrics"
-    clickhouseTable = "samples"
+    # [[prom2click.cfgs]]
+    # host = "0.0.0.0"
+    # port = 19006
+    # clickhouseDSN = "tcp://clickhouse:9000?username=default&read_timeout=10&write_timeout=10&debug=true"
+    # clickhouseDB = "metrics"
+    # clickhouseTable = "samples"
 
     [clickhouse]
     host = "clickhouse"
@@ -105,5 +105,5 @@ data:
     username = "default"
     # password = ""
 
-    [defaultCh]
-    dsn = "clickhouse://default:@clickhouse:8123/default?max_execution_time=60"
+    # [defaultCh]
+    # dsn = "clickhouse://default:@clickhouse:8123/default?max_execution_time=60"
