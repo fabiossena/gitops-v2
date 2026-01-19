@@ -4,27 +4,38 @@ metadata:
   name: redpanda-config
 data:
   redpanda.yaml: |
-    node_id: 0
-    data_directory: /var/lib/redpanda/data
-    
-    kafka_api:
-    - address: 0.0.0.0
-      port: 9092
-      name: plaintext
-
+    # Main Redpanda configuration
     redpanda:
+      # Node configuration
+      node_id: ${NODE_ID}
+      data_directory: /var/lib/redpanda/data
+      
+      # Kafka API configuration
       kafka_api:
         - address: 0.0.0.0
           port: 9092
+      
+      # Admin API configuration
       admin_api:
         - address: 0.0.0.0
-        port: 9644
-      seed_servers: []
-      node_id: 1
-      data_directory: /var/lib/redpanda/data
-
+          port: 9644
       
-    replication_factor: 3
-    seed_servers:
-    - host: redpanda-0.redpanda.logging.svc.cluster.local
-      port: 33145
+      # RPC configuration for inter-node communication
+      rpc_server:
+        address: 0.0.0.0
+        port: 33145
+      
+      # For single-node cluster, seed_servers can be empty
+      seed_servers: []
+      
+      # Single-node configuration
+      developer_mode: true
+      enable_pprof: true
+      
+      # Memory configuration
+      memory:
+        reserve_non_msvc: 1G
+        disable_coredump: false
+      
+      # Log configuration
+      log_segment_size: 268435456

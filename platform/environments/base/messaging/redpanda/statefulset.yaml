@@ -2,11 +2,9 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redpanda
-  namespace: production-messaging
 spec:
   serviceName: "redpanda"
   replicas: 1
-  podManagementPolicy: Parallel  # Important for Redpanda cluster formation
   selector:
     matchLabels:
       app: redpanda
@@ -15,33 +13,32 @@ spec:
       labels:
         app: redpanda
     spec:
-      terminationGracePeriodSeconds: 120  # Redpanda needs time to shut down
+      terminationGracePeriodSeconds: 120
       containers:
       - name: redpanda
         image: redpandadata/redpanda:latest-fips
-        command: ["/bin/sh", "-c"]
+        command: ["/bin/bash", "-c"]
         args:
           - |
-            # Extract node ID from pod name
-            NODE_ID=$(echo ${POD_NAME} | sed 's/redpanda-//')
-            # Generate config with proper node ID
-            envsubst < /etc/redpanda/redpanda.yaml.template > /etc/redpanda/redpanda.yaml
+            # Get node ID from pod name (removes "redpanda-" prefix)
+            NODE_ID=${HOSTNAME##*-}
+            echo "Starting Redpanda with node_id=${NODE_ID}"
+            
+            # Set environment variable for substitution
+            export NODE_ID
+            
+            # Create config with substituted node_id
+            cat /etc/redpanda/redpanda.yaml.template | envsubst > /etc/redpanda/redpanda.yaml
+            
             # Start Redpanda
             exec rpk redpanda start \
               --config /etc/redpanda/redpanda.yaml \
               --overprovisioned \
               --smp 1 \
               --memory 2G \
-              --reserve-memory 1G
+              --reserve-memory 1G \
+              --node-id ${NODE_ID}
         env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: REDPANDA_NODE_ID
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
         - name: HOSTNAME
           valueFrom:
             fieldRef:
@@ -67,16 +64,24 @@ spec:
           mountPath: /etc/redpanda/redpanda.yaml.template
           subPath: redpanda.yaml
           readOnly: true
+        # Add a startup probe to ensure Redpanda is ready
+        startupProbe:
+          tcpSocket:
+            port: 9092
+          failureThreshold: 30
+          periodSeconds: 10
         readinessProbe:
           tcpSocket:
             port: 9092
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
           periodSeconds: 5
+          timeoutSeconds: 5
         livenessProbe:
           tcpSocket:
             port: 9092
-          initialDelaySeconds: 20
+          initialDelaySeconds: 45
           periodSeconds: 10
+          timeoutSeconds: 5
       volumes:
       - name: config
         configMap:
