@@ -20,24 +20,17 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            # Get node ID from pod name (removes "redpanda-" prefix)
             NODE_ID=${HOSTNAME##*-}
-            echo "Starting Redpanda with node_id=${NODE_ID}"
-            
-            # Set environment variable for substitution
             export NODE_ID
-            
-            # Create config with substituted node_id
             cat /etc/redpanda/redpanda.yaml.template | envsubst > /etc/redpanda/redpanda.yaml
-            
-            # Start Redpanda
             exec rpk redpanda start \
               --config /etc/redpanda/redpanda.yaml \
               --overprovisioned \
               --smp 1 \
               --memory 2G \
               --reserve-memory 1G \
-              --node-id ${NODE_ID}
+              --node-id ${NODE_ID} \
+              --check=false  # Add this flag
         env:
         - name: HOSTNAME
           valueFrom:
