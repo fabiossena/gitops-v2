@@ -23,11 +23,36 @@ spec:
           env:
             - name: EGO_CONFIG_PATH
               value: "/clickvisual/config/default.toml"
+            - name: TZ
+              value: "UTC"
           volumeMounts:
             - name: config
-              mountPath: /clickvisual/config/default.toml  # Montar como arquivo
+              mountPath: /clickvisual/config/default.toml
               subPath: default.toml
               readOnly: true
+            - name: data
+              mountPath: /clickvisual/data
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
       volumes:
         - name: config
           configMap:
@@ -35,3 +60,6 @@ spec:
             items:
             - key: default.toml
               path: default.toml
+        - name: data
+          persistentVolumeClaim:
+            claimName: clickvisual-pvc

@@ -8,5 +8,6 @@ spec:
     app: clickvisual
   ports:
     - port: 80
-      targetPort: 3000
+      targetPort: 3001
+      name: http
   type: ClusterIP
