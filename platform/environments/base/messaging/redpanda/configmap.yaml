@@ -8,41 +8,11 @@ data:
     data_directory: /var/lib/redpanda/data
     
     kafka_api:
-      - address: 0.0.0.0
-        port: 9092
-        name: plaintext
+    - address: 0.0.0.0
+      port: 9092
+      name: plaintext
 
-    admin:
-      - address: 0.0.0.0
-        port: 9644
-        
     replication_factor: 3
-    # seed_servers:
-    #   - host: redpanda-0.redpanda.logging.svc.cluster.local
-    #     port: 33145
-
-        
-    
-    # Advertised addresses
-    advertised_kafka_api:
-      - address: ${POD_IP}
-        port: 9092
-        name: plaintext
-    
-    advertised_rpc_api:
-      address: ${POD_IP}
-      port: 33145
-    
-    # Seed servers
     seed_servers:
-      - host:
-          address: redpanda-0.redpanda.production-messaging.svc.cluster.local
-          port: 33145
-    
-    # Cluster settings
-    redpanda:
-      empty_seed_starts_cluster: true
-      enable_leader_balancer: true
-    
-    # Developer mode (less strict checks)
-    developer_mode: true
+    - host: redpanda-0.redpanda.logging.svc.cluster.local
+      port: 33145
