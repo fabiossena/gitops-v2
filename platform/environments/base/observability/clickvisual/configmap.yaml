@@ -14,3 +14,6 @@ data:
     [clickhouse]
     address = "clickhouse:8123"
     database = "default"
+
+    [auth]
+    enabled = false
