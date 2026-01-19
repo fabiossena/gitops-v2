@@ -20,21 +20,24 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            echo "=== Starting Redpanda ==="
+            # Configuração mínima inline
+            cat > /tmp/redpanda.yaml << 'EOF'
+            node_id: 0
+            data_directory: /var/lib/redpanda/data
+            developer_mode: true
+            EOF
             
-            # Mostrar configuração
-            echo "=== Configuration ==="
-            cat /etc/redpanda/redpanda.yaml
-            echo "=== End Configuration ==="
-            
-            # Start Redpanda
+            # Iniciar Redpanda com flags que forçam bind externo
             exec rpk redpanda start \
-              --config /etc/redpanda/redpanda.yaml \
-              --overprovisioned \
+              --config /tmp/redpanda.yaml \
               --smp 1 \
               --memory 2G \
-              --reserve-memory 1G \
-              --check=false
+              --overprovisioned \
+              --check=false \
+              --kafka-addr PLAINTEXT://0.0.0.0:9092 \
+              --advertise-kafka-addr PLAINTEXT://$(hostname).redpanda.production-messaging.svc.cluster.local:9092 \
+              --rpc-addr 0.0.0.0:33145 \
+              --advertise-rpc-addr $(hostname).redpanda.production-messaging.svc.cluster.local:33145
         env:
         - name: ALLOW_PLAINTEXT_LISTENER
           value: "yes"
