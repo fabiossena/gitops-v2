@@ -20,35 +20,24 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            # Extract node ID from pod name
-            NODE_ID=${HOSTNAME##*-}
-            echo "Starting Redpanda with node_id=${NODE_ID}"
+            echo "=== Starting Redpanda ==="
             
-            # Export for envsubst
-            export NODE_ID
-            
-            # Create final config from template
-            cat /etc/redpanda/redpanda.yaml.template | envsubst > /etc/redpanda/redpanda.yaml
-            
-            # Debug: show the generated config
-            echo "=== Generated Configuration ==="
+            # Mostrar configuração
+            echo "=== Configuration ==="
             cat /etc/redpanda/redpanda.yaml
             echo "=== End Configuration ==="
             
-            # Start Redpanda with all flags
+            # Start Redpanda
             exec rpk redpanda start \
               --config /etc/redpanda/redpanda.yaml \
               --overprovisioned \
               --smp 1 \
               --memory 2G \
               --reserve-memory 1G \
-              --node-id ${NODE_ID} \
               --check=false
         env:
-        - name: HOSTNAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
+        - name: ALLOW_PLAINTEXT_LISTENER
+          value: "yes"
         ports:
         - containerPort: 9092
           name: kafka
@@ -67,44 +56,19 @@ spec:
         - name: data
           mountPath: /var/lib/redpanda/data
         - name: config
-          mountPath: /etc/redpanda/redpanda.yaml.template
+          mountPath: /etc/redpanda/redpanda.yaml
           subPath: redpanda.yaml
           readOnly: true
-        # Add startup probe to give Redpanda time to start
-        startupProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/9092'
-          failureThreshold: 30
-          periodSeconds: 10
-          initialDelaySeconds: 10
-        # Use exec probe instead of tcpSocket for better control
         livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - |
-              # Check if Redpanda is responding on admin API
-              curl -f http://localhost:9644/v1/status/ready || exit 1
-          initialDelaySeconds: 45
-          periodSeconds: 20
-          timeoutSeconds: 5
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - |
-              # Check Kafka API
-              timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/9092' && \
-              # Check Admin API
-              curl -f http://localhost:9644/v1/status/ready
+          tcpSocket:
+            port: 9092
           initialDelaySeconds: 30
           periodSeconds: 10
-          timeoutSeconds: 5
+        readinessProbe:
+          tcpSocket:
+            port: 9092
+          initialDelaySeconds: 20
+          periodSeconds: 5
       volumes:
       - name: config
         configMap:
