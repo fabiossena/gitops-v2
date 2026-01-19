@@ -9,7 +9,7 @@ data:
     port = 8089
     
     [server.http]
-    enabled = true
+    enabled = false
     host = "0.0.0.0"
     read_timeout = "60s"
     write_timeout = "60s"
