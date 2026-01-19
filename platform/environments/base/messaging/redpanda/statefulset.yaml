@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redpanda
+  namespace: production-messaging
 spec:
   serviceName: "redpanda"
   replicas: 1
@@ -16,31 +17,41 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
       - name: redpanda
-        image: redpandadata/redpanda:latest-fips
+        image: docker.redpanda.com/redpandadata/redpanda:v24.2.1  # Use official image
         command: ["/bin/bash", "-c"]
         args:
           - |
-            # Configuração mínima inline
-            cat > /tmp/redpanda.yaml << 'EOF'
-            node_id: 0
-            data_directory: /var/lib/redpanda/data
-            developer_mode: true
+            # Create configuration
+            cat > /etc/redpanda/redpanda.yaml << 'EOF'
+            redpanda:
+              data_directory: /var/lib/redpanda/data
+              node_id: 0
+              seed_servers: []
+              rpc_server:
+                address: 0.0.0.0
+                port: 33145
+              kafka_api:
+                - address: 0.0.0.0
+                  port: 9092
+                  name: PLAINTEXT
+              admin:
+                - address: 0.0.0.0
+                  port: 9644
+              advertised_kafka_api:
+                - address: 0.0.0.0  # Will be accessible via service
+                  port: 9092
+                  name: PLAINTEXT
+              auto_create_topics_enabled: true
+              developer_mode: true
             EOF
             
-            # Iniciar Redpanda com flags que forçam bind externo
+            # Start Redpanda
             exec rpk redpanda start \
-              --config /tmp/redpanda.yaml \
+              --config /etc/redpanda/redpanda.yaml \
               --smp 1 \
               --memory 2G \
               --overprovisioned \
-              --check=false \
-              --kafka-addr PLAINTEXT://0.0.0.0:9092 \
-              --advertise-kafka-addr PLAINTEXT://$(hostname).redpanda.production-messaging.svc.cluster.local:9092 \
-              --rpc-addr 0.0.0.0:33145 \
-              --advertise-rpc-addr $(hostname).redpanda.production-messaging.svc.cluster.local:33145
-        env:
-        - name: ALLOW_PLAINTEXT_LISTENER
-          value: "yes"
+              --check=false
         ports:
         - containerPort: 9092
           name: kafka
@@ -50,11 +61,11 @@ spec:
           name: admin
         resources:
           requests:
-            memory: "3Gi"
+            memory: "2Gi"
             cpu: "500m"
           limits:
-            memory: "4Gi"
-            cpu: "2"
+            memory: "3Gi"
+            cpu: "1"
         volumeMounts:
         - name: data
           mountPath: /var/lib/redpanda/data
@@ -87,4 +98,4 @@ spec:
       resources:
         requests:
           storage: 20Gi
-      storageClassName: local-path
+      storageClassName: local-path  # Add this!
