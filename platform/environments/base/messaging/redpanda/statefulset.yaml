@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
       - name: redpanda
-        image: redpandadata/redpanda:v23.3.1-fips
+        image: redpandadata/redpanda:latest-fips
         command: ["rpk"]
         args:
           - "container"
