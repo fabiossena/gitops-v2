@@ -5,6 +5,7 @@ metadata:
 # dsn = "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql.production-database.svc.cluster.local:3306)/clickvisual?charset=utf8mb4&parseTime=True&loc=Local"
 data:
   default.toml: |
+    [server]
     port = 3001
 
     [mysql]
