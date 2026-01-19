@@ -12,3 +12,8 @@ data:
     host = "clickhouse"
     port = 8123
     database = "default"
+
+    [auth]
+    enabled = false
+    jwt_secret = "change-me-in-production-please"
+    token_ttl = 86400
