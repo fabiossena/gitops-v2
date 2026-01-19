@@ -79,12 +79,12 @@ spec:
           items:
           - key: redpanda.yaml
             path: redpanda.yaml
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 20Gi
-      storageClassName: local-path
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: data
+  #   spec:
+  #     accessModes: ["ReadWriteOnce"]
+  #     resources:
+  #       requests:
+  #         storage: 20Gi
+  #     storageClassName: local-path
