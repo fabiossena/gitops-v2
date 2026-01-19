@@ -3,7 +3,7 @@
   metadata:
     name: kafdrop
   spec:
-    type: ClusterIP
+    type: NodePort
     ports:
     - port: 9000
       targetPort: 9000
