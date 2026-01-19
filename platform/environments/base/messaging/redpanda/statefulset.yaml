@@ -20,21 +20,35 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            # Debug: Mostrar configuração carregada
-            echo "=== Redpanda Configuration ==="
-            cat /etc/redpanda/redpanda.yaml
-            echo "=== Starting Redpanda ==="
+            # Extract node ID from pod name
+            NODE_ID=${HOSTNAME##*-}
+            echo "Starting Redpanda with node_id=${NODE_ID}"
             
-            # Iniciar Redpanda APENAS com o arquivo de configuração
-            # NÃO adicione flags extras que possam sobrepor a configuração
-            exec rpk redpanda start --config /etc/redpanda/redpanda.yaml
+            # Export for envsubst
+            export NODE_ID
+            
+            # Create final config from template
+            cat /etc/redpanda/redpanda.yaml.template | envsubst > /etc/redpanda/redpanda.yaml
+            
+            # Debug: show the generated config
+            echo "=== Generated Configuration ==="
+            cat /etc/redpanda/redpanda.yaml
+            echo "=== End Configuration ==="
+            
+            # Start Redpanda with all flags
+            exec rpk redpanda start \
+              --config /etc/redpanda/redpanda.yaml \
+              --overprovisioned \
+              --smp 1 \
+              --memory 2G \
+              --reserve-memory 1G \
+              --node-id ${NODE_ID} \
+              --check=false
         env:
         - name: HOSTNAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: ALLOW_PLAINTEXT_LISTENER  # Permite listener sem TLS
-          value: "yes"
         ports:
         - containerPort: 9092
           name: kafka
@@ -44,35 +58,53 @@ spec:
           name: admin
         resources:
           requests:
-            memory: "2Gi"  # Reduzi para 2Gi
+            memory: "3Gi"
             cpu: "500m"
           limits:
-            memory: "3Gi"
-            cpu: "1"
+            memory: "4Gi"
+            cpu: "2"
         volumeMounts:
         - name: data
           mountPath: /var/lib/redpanda/data
         - name: config
-          mountPath: /etc/redpanda/redpanda.yaml
+          mountPath: /etc/redpanda/redpanda.yaml.template
           subPath: redpanda.yaml
           readOnly: true
-        # Probes simplificadas
+        # Add startup probe to give Redpanda time to start
         startupProbe:
-          tcpSocket:
-            port: 9092
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/9092'
           failureThreshold: 30
-          periodSeconds: 5
-          initialDelaySeconds: 5
+          periodSeconds: 10
+          initialDelaySeconds: 10
+        # Use exec probe instead of tcpSocket for better control
         livenessProbe:
-          tcpSocket:
-            port: 9092
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Check if Redpanda is responding on admin API
+              curl -f http://localhost:9644/v1/status/ready || exit 1
+          initialDelaySeconds: 45
+          periodSeconds: 20
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Check Kafka API
+              timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/9092' && \
+              # Check Admin API
+              curl -f http://localhost:9644/v1/status/ready
           initialDelaySeconds: 30
           periodSeconds: 10
-        readinessProbe:
-          tcpSocket:
-            port: 9092
-          initialDelaySeconds: 15
-          periodSeconds: 5
+          timeoutSeconds: 5
       volumes:
       - name: config
         configMap:
