@@ -1,3 +1,4 @@
+# statefulset-container.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -16,25 +17,14 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
       - name: redpanda
-        image: redpandadata/redpanda:latest-fips
-        command: ["/bin/bash", "-c"]
+        image: redpandadata/redpanda:v23.3.1-fips
+        command: ["rpk"]
         args:
-          - |
-            # Debug: Mostrar configuração carregada
-            echo "=== Redpanda Configuration ==="
-            cat /etc/redpanda/redpanda.yaml
-            echo "=== Starting Redpanda ==="
-            
-            # Iniciar Redpanda APENAS com o arquivo de configuração
-            # NÃO adicione flags extras que possam sobrepor a configuração
-            exec rpk redpanda start --config /etc/redpanda/redpanda.yaml
-        env:
-        - name: HOSTNAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: ALLOW_PLAINTEXT_LISTENER  # Permite listener sem TLS
-          value: "yes"
+          - "container"
+          - "start"
+          - "--mode"
+          - "dev"
+          - "--check=false"
         ports:
         - containerPort: 9092
           name: kafka
@@ -42,49 +32,4 @@ spec:
           name: rpc
         - containerPort: 9644
           name: admin
-        resources:
-          requests:
-            memory: "2Gi"  # Reduzi para 2Gi
-            cpu: "500m"
-          limits:
-            memory: "3Gi"
-            cpu: "1"
-        volumeMounts:
-        - name: data
-          mountPath: /var/lib/redpanda/data
-        - name: config
-          mountPath: /etc/redpanda/redpanda.yaml
-          subPath: redpanda.yaml
-          readOnly: true
-        # Probes simplificadas
-        startupProbe:
-          tcpSocket:
-            port: 9092
-          failureThreshold: 30
-          periodSeconds: 5
-          initialDelaySeconds: 5
-        livenessProbe:
-          tcpSocket:
-            port: 9092
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          tcpSocket:
-            port: 9092
-          initialDelaySeconds: 15
-          periodSeconds: 5
-      volumes:
-      - name: config
-        configMap:
-          name: redpanda-config
-          items:
-          - key: redpanda.yaml
-            path: redpanda.yaml
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 20Gi
+        # ... resto igual
