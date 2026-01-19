@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafdrop
-  namespace: production-messaging
 spec:
   replicas: 1
   selector:
@@ -15,13 +14,27 @@ spec:
     spec:
       containers:
       - name: kafdrop
-        image: obsidiandynamics/kafdrop:latest
+        image: obsidiandynamics/kafdrop:4.0.1  # Use versão específica
         env:
         - name: KAFKA_BROKERCONNECT
           value: "redpanda.production-messaging.svc.cluster.local:9092"
         - name: SERVER_PORT
           value: "9000"
         - name: JVM_OPTS
-          value: "-Xms512M -Xmx512M"
+          value: "-Xms512M -Xmx512M -Dkafdrop.security.enabled=false"
+        - name: SERVER_SERVLET_CONTEXT_PATH
+          value: "/"
         ports:
         - containerPort: 9000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 60
+          periodSeconds: 30
