@@ -78,6 +78,9 @@ spec:
             periodSeconds: 15
             timeoutSeconds: 5
             failureThreshold: 6
+          # volumeMounts:
+          #   - name: clickvisual-config
+    mountPath: /clickvisual/config
       volumes:
         - name: config
           configMap:
