@@ -24,8 +24,9 @@ spec:
             - /clickvisual/bin/clickvisual
 
           args:
-            - "-config"
-            - "/clickvisual/config/default.toml"
+            - server
+            - -config
+            - /clickvisual/config/default.toml
 
           ports:
             - containerPort: 3001
