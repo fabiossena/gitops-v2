@@ -20,11 +20,11 @@ spec:
           image: clickvisual/clickvisual:latest
 
           command:
-            - clickvisual
+            - /clickvisual/bin/clickvisual
 
           args:
-            - server
-            - '-config=/clickvisual/config/default.toml'
+            - -config
+            - /clickvisual/config/default.toml
 
           ports:
             - containerPort: 3001
