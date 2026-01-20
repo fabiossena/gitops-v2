@@ -16,7 +16,10 @@ spec:
         - name: ghcr-secret
       containers:
         - name: clickvisual
-          image: clickvisual/clickvisual:latest
+          image: clickvisual/clickvisual:latest 
+          args:
+            - "-config"
+            - "/clickvisual/config/default.toml"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
