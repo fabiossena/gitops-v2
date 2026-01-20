@@ -25,7 +25,21 @@ spec:
             - "server"
             - "-config"
             - "/clickvisual/config/default.toml"
-            
+          
+          initContainers:
+            - name: wait-mysql
+              image: mysql:8.0
+              command:
+                - sh
+                - -c
+                - |
+                  until mysql -h mysql.production-database.svc.cluster.local \
+                    -u root -proot123 -e "SELECT 1"; do
+                    echo "Waiting for MySQL..."
+                    sleep 3
+                  done
+
+
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
