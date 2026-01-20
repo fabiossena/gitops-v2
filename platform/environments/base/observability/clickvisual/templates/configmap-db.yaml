@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickvisual-db-init
+data:
+  database.sql: |
+    {{ (.Files.Get "files/database.sql") | indent 4 }}

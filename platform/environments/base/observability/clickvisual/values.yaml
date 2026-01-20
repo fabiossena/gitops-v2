@@ -1,0 +1,33 @@
+image:
+  repository: clickvisual/clickvisual
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 3001
+
+mysql:
+  host: mysql.production-database.svc.cluster.local
+  port: 3306
+  user: root
+  password: root123
+  database: clickvisual
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 5Gi
+  storageClass: ""
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
+timezone: UTC
