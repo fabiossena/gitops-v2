@@ -21,7 +21,6 @@ spec:
           imagePullPolicy: IfNotPresent
 
           args:
-            - -config
             - /clickvisual/config/default.toml
 
           ports:
