@@ -20,18 +20,26 @@ spec:
           image: clickvisual/clickvisual:latest
           imagePullPolicy: IfNotPresent
 
-          command:
-            - /clickvisual/bin/clickvisual
+          # command:
+          #   - /clickvisual/bin/clickvisual
 
-          args:
-            - server
-            - -config
-            - /clickvisual/config/default.toml
+          # args:
+          #   - server
+          #   - -config
+          #   - /clickvisual/config/default.toml
 
           ports:
             - containerPort: 3001
 
+          command:
+            - /clickvisual/bin/clickvisual
+            - server
+            - -config
+            - /clickvisual/config/default.toml
+
           env:
+            - name: EGO_CONFIG_PATH
+              value: /clickvisual/config/default.toml
             - name: TZ
               value: UTC
 
