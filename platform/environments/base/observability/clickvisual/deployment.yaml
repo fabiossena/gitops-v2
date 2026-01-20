@@ -31,11 +31,11 @@ spec:
           ports:
             - containerPort: 3001
 
-          command:
-            - /clickvisual/bin/clickvisual
-            - server
-            - -config
-            - /clickvisual/config/default.toml
+          # command:
+          #   - /clickvisual/bin/clickvisual
+          #   - server
+          #   - -config
+          #   - /clickvisual/config/default.toml
 
           env:
             - name: EGO_CONFIG_PATH
