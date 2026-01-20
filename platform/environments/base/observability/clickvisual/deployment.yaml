@@ -19,8 +19,8 @@ spec:
         - name: clickvisual
           image: clickvisual/clickvisual:latest
 
-          command:
-            - /clickvisual/bin/clickvisual
+          # command:
+          #   - /clickvisual/bin/clickvisual
 
           args:
             - -config
