@@ -17,11 +17,15 @@ spec:
       containers:
         - name: clickvisual
           image: clickvisual/clickvisual:latest
+
           command:
             - "/clickvisual/bin/clickvisual"
+
           args:
+            - "server"
             - "-config"
             - "/clickvisual/config/default.toml"
+            
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
