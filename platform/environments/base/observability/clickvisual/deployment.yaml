@@ -16,7 +16,9 @@ spec:
         - name: ghcr-secret
       containers:
         - name: clickvisual
-          image: clickvisual/clickvisual:latest 
+          image: clickvisual/clickvisual:latest
+          command:
+            - "/clickvisual/bin/clickvisual"
           args:
             - "-config"
             - "/clickvisual/config/default.toml"
