@@ -64,7 +64,7 @@ When starting with a fresh Linux installation, if you encounter errors, run eith
 ### Execution Commands
 
 #### Standard Execution
-Navigate to ansible directory:cd iac/ansible/
+Navigate to ansible directory:cd provisioning/ansible/
 - Se preferir formato INI, há um exemplo em `inventory/OLD_hosts.ini`.
 Run playbook:
 ```bash ansible/
