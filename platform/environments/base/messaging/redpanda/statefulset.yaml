@@ -13,34 +13,37 @@ spec:
       labels:
         app: redpanda
     spec:
-      terminationGracePeriodSeconds: 120
+      terminationGracePeriodSeconds: 60
       containers:
       - name: redpanda
         image: redpandadata/redpanda:latest-fips
-        command: ["/bin/bash", "-c"]
+        command: ["rpk"]
         args:
-          - |
-            # Configuração mínima inline
-            cat > /tmp/redpanda.yaml << 'EOF'
-            node_id: 0
-            data_directory: /var/lib/redpanda/data
-            developer_mode: true
-            EOF
-            
-            # Iniciar Redpanda com flags que forçam bind externo
-            exec rpk redpanda start \
-              --config /tmp/redpanda.yaml \
-              --smp 1 \
-              --memory 2G \
-              --overprovisioned \
-              --check=false \
-              --kafka-addr PLAINTEXT://0.0.0.0:9092 \
-              --advertise-kafka-addr PLAINTEXT://$(hostname).redpanda.production-messaging.svc.cluster.local:9092 \
-              --rpc-addr 0.0.0.0:33145 \
-              --advertise-rpc-addr $(hostname).redpanda.production-messaging.svc.cluster.local:33145
+          - "redpanda"
+          - "start"
+          - "--smp"
+          - "1"
+          - "--memory"
+          - "2G"
+          - "--overprovisioned"
+          - "--check=false"
+          - "--kafka-addr"
+          - "PLAINTEXT://0.0.0.0:9092"
+          - "--advertise-kafka-addr"
+          - "PLAINTEXT://$(POD_NAME).redpanda.production-messaging.svc.cluster.local:9092"
+          - "--rpc-addr"
+          - "0.0.0.0:33145"
+          - "--advertise-rpc-addr"
+          - "$(POD_NAME).redpanda.production-messaging.svc.cluster.local:33145"
+          - "--admin"
+          - "0.0.0.0:9644"
         env:
         - name: ALLOW_PLAINTEXT_LISTENER
           value: "yes"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         ports:
         - containerPort: 9092
           name: kafka
@@ -50,35 +53,24 @@ spec:
           name: admin
         resources:
           requests:
-            memory: "3Gi"
+            memory: "2Gi"
             cpu: "500m"
           limits:
-            memory: "4Gi"
-            cpu: "2"
+            memory: "2Gi"
+            cpu: "1"
         volumeMounts:
         - name: data
           mountPath: /var/lib/redpanda/data
-        - name: config
-          mountPath: /etc/redpanda/redpanda.yaml
-          subPath: redpanda.yaml
-          readOnly: true
         livenessProbe:
           tcpSocket:
             port: 9092
-          initialDelaySeconds: 30
+          initialDelaySeconds: 15
           periodSeconds: 10
         readinessProbe:
           tcpSocket:
             port: 9092
-          initialDelaySeconds: 20
+          initialDelaySeconds: 10
           periodSeconds: 5
-      volumes:
-      - name: config
-        configMap:
-          name: redpanda-config
-          items:
-          - key: redpanda.yaml
-            path: redpanda.yaml
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -86,5 +78,5 @@ spec:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 20Gi
+          storage: 2Gi
       storageClassName: local-path
