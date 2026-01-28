@@ -37,7 +37,8 @@ spec:
               --kafka-addr PLAINTEXT://0.0.0.0:9092 \
               --advertise-kafka-addr PLAINTEXT://$(hostname).redpanda.production-messaging.svc.cluster.local:9092 \
               --rpc-addr 0.0.0.0:33145 \
-              --advertise-rpc-addr $(hostname).redpanda.production-messaging.svc.cluster.local:33145
+              --advertise-rpc-addr $(hostname).redpanda.production-messaging.svc.cluster.local:33145 \
+              --admin 0.0.0.0:9644  # <-- ADICIONADO PARA UI
         env:
         - name: ALLOW_PLAINTEXT_LISTENER
           value: "yes"
