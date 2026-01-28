@@ -13,3 +13,4 @@ spec:
     - name: http
       port: 8123
       targetPort: 8123
+      nodePort: 30123
