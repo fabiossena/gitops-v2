@@ -1,15 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: clickhouse
+  name: clickhouse-nodeport
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     app: clickhouse
   ports:
-    - name: tcp
-      port: 9000
-      targetPort: 9000
     - name: http
       port: 8123
       targetPort: 8123
