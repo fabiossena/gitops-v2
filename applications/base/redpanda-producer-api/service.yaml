@@ -8,4 +8,5 @@ spec:
   ports:
   - port: 8980
     targetPort: 8980
-  type: ClusterIP
+    nodePort: 30080
+  type: NodePort  
