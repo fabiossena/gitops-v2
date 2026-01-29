@@ -16,3 +16,7 @@ images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
   newTag: 9bf39b2825d6f989dd3ff26ea15e59873d018b3a
+
+- name: ghcr.io/fabiossena/redpanda-producer-api
+  newName: ghcr.io/fabiossena/redpanda-producer-api
+  newTag: v1.0.0

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redpanda-producer-api
+spec:
+  selector:
+    app: redpanda-producer-api
+  ports:
+  - port: 8980
+    targetPort: 8980
+  type: ClusterIP

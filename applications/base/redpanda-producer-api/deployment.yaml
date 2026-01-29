@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redpanda-producer-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redpanda-producer-api
+  template:
+    metadata:
+      labels:
+        app: redpanda-producer-api
+    spec:
+      containers:
+      - name: producer-api
+        image: ghcr.io/fabiossena/redpanda-producer-api:v1.0.0
+        ports:
+        - containerPort: 8980
+        env:
+        - name: REDPANDA_BROKERS
+          value: "redpanda-client.production-messaging.svc.cluster.local:9092"
+        - name: ENVIRONMENT
+          value: "production"
+        - name: LOG_LEVEL
+          value: "info"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8980
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8980
+          initialDelaySeconds: 5
+          periodSeconds: 5

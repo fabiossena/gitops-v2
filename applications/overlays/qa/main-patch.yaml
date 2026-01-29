@@ -10,3 +10,11 @@ spec:
           env:
             - name: APP_ENV
               value: qa
+--- 
+# desabilitar o redpanda-producer-api
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redpanda-producer-api
+spec:
+  replicas: 0
