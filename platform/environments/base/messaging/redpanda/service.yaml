@@ -1,18 +1,19 @@
+# service-nodeport.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: redpanda
+  name: redpanda-external
+  namespace: production-messaging
 spec:
-  clusterIP: None  # Headless service for StatefulSet
+  type: NodePort
   selector:
     app: redpanda
   ports:
   - name: kafka
     port: 9092
     targetPort: 9092
-  - name: rpc
-    port: 33145
-    targetPort: 33145
+    nodePort: 31092  # Porta fixa entre 30000-32767
   - name: admin
     port: 9644
     targetPort: 9644
+    nodePort: 31093  # Porta fixa entre 30000-32767
