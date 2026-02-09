@@ -1,5 +1,6 @@
 ﻿resources:
   - main-app
   - anchor-api
+  - fss-site
   - redpanda-producer-api
   - jobs
