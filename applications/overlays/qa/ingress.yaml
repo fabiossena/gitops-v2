@@ -2,19 +2,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: qa-ingress
-  namespace: qa-namespace
-  labels:
-    app: anchor-api
 spec:
   ingressClassName: traefik
   rules:
-  - host: app.fsysolutions.com
+  - host: app-qa.fsysolutions.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: anchor-api
+            name: fss-site
             port:
               number: 80

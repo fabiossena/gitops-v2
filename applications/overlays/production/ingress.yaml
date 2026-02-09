@@ -1,9 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: main-ingress
-  labels:
-    app: main-app
+  name: production-ingress
 spec:
   rules:
   - host: app.fsysolutions.com
@@ -13,6 +11,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: main-app
+            name: fss-site
             port:
               number: 80

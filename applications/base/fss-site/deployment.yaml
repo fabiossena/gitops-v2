@@ -1,0 +1,20 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fss-site
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fss-site
+  template:
+    metadata:
+      labels:
+        app: fss-site
+    spec:
+      containers:
+      - name: fss-site
+        image: ghcr.io/fabiossena/fss-site-v1:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 80

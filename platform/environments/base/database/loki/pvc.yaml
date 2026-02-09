@@ -1,0 +1,40 @@
+# Para ambiente DEV/TEST - Usando hostPath
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: loki-storage
+  namespace: loki
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/loki
+    type: DirectoryOrCreate
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: loki-storage-claim
+  namespace: loki
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+  # apiVersion: v1
+  # kind: PersistentVolumeClaim
+  # metadata:
+  #   name: loki-storage-claim
+  #   namespace: loki
+  # spec:
+  #   accessModes:
+  #     - ReadWriteOnce
+  #   storageClassName: standard # ou seu StorageClass
+  #   resources:
+  #     requests:
+  #       storage: 50Gi      

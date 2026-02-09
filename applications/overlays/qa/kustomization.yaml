@@ -20,3 +20,7 @@ images:
 - name: ghcr.io/fabiossena/redpanda-producer-api
   newName: ghcr.io/fabiossena/redpanda-producer-api
   newTag: v1.0.0
+
+- name: ghcr.io/fabiossena/fss-site-v1
+  newName: ghcr.io/fabiossena/fss-site-v1
+  newTag: v1.0.1
