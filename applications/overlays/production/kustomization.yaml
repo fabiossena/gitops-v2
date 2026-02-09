@@ -4,7 +4,7 @@ namespace: production-namespace
 resources:
 - ../../base
 # - namespace.yaml
-  # - ingress.yaml
+- ingress.yaml
 
 patches:
 - path: main-patch.yaml
