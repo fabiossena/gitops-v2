@@ -1,9 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: production-namespace
+# - namespace.yaml
 resources:
 - ../../base
-# - namespace.yaml
 - ingress.yaml
 
 patches:
@@ -12,14 +12,14 @@ commonLabels:
   env: production
   
 
+
 images:
 - name: ghcr.io/fabiossena/anchor-api
   newName: ghcr.io/fabiossena/anchor-api
   newTag: v1.0.1
-- name: ghcr.io/fabiossena/redpanda-producer-api
-  newName: ghcr.io/fabiossena/redpanda-producer-api
-  newTag: v1.0.1
-
 - name: ghcr.io/fabiossena/fss-site-v1
   newName: ghcr.io/fabiossena/fss-site-v1
+  newTag: v1.0.2
+- name: ghcr.io/fabiossena/redpanda-producer-api
+  newName: ghcr.io/fabiossena/redpanda-producer-api
   newTag: v1.0.1
