@@ -18,7 +18,7 @@ images:
   newTag: b6d0fddbc07b0eb28fd6b7b5c5a0e8068c9b9426
 - name: ghcr.io/fabiossena/fss-site-v1
   newName: ghcr.io/fabiossena/fss-site-v1
-  newTag: ce1a68c62888372d3f23c14144f96514581febb3
+  newTag: 268e117aef47d348323fb92204e5639e1879135a
 - name: ghcr.io/fabiossena/redpanda-producer-api
   newName: ghcr.io/fabiossena/redpanda-producer-api
   newTag: dbee9b7915de0f40e0408362509c0e1a620551ba
